@@ -16,7 +16,9 @@ public class JavaScriptExample {
 							//executeScript("return document.title;"));	
 							//executeScript("return document.getElementsByClassName(\'subscribe\').length;"));
 							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerText;"));
-							executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerHTML;"));
+							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerHTML;"));
+							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"value\");"));
+							executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"textContent\");"));
 		}
 		
         driver.get("http://www.cs.berkeley.edu/~bodik/");
