@@ -18,7 +18,9 @@ public class JavaScriptExample {
 							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerText;"));
 							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerHTML;"));
 							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"value\");"));
-							executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"textContent\");"));
+							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"textContent\");"));
+							//firefox doesn't use innerText, uses textContent
+							executeScript("return document.getElementsByClassName(\'subscribe\')[0].textContent;"));
 		}
 		
         driver.get("http://www.cs.berkeley.edu/~bodik/");
