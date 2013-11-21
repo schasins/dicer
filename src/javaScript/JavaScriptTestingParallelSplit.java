@@ -58,13 +58,20 @@ public class JavaScriptTestingParallelSplit {
 		int high = low+1;
 		int threshold = jobs%threads;
 		int rowCounter = 0;
+		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		for (int i = 0; i < threads; i++){
 			int jump = (i < threshold) ? high : low;
 			List<String[]> rowsSlice = this.rows.subList(rowCounter, rowCounter+jump);
 			rowCounter += jump;
 			RunTests r = new RunTests(rowsSlice,this.javaScriptFunction, this.writer);
 	        Thread t = new Thread(r);
+	        threadList.add(t);
 	        t.start();
+		}
+		
+		//barrier
+		for (Thread thread : threadList) {
+		    try {thread.join();} catch (InterruptedException e) {System.out.println("Could not join thread.");}
 		}
 		
 		//Close output writer
@@ -108,7 +115,7 @@ public class JavaScriptTestingParallelSplit {
 	}
 	
 	public static void main(String[] args) {
-		String inputFile = "resources/input.csv";
+		String inputFile = "resources/input2.csv";
 		String javaScriptFunction = "var func = function(a,b){return document.title+' - '+a+' - '+b;};";
 		String outputFile = "resources/output.csv";
 		
