@@ -15,7 +15,7 @@ import com.google.common.base.Joiner;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
-public class JavaScriptTesting {
+public class JavaScriptTestingSerial {
 	
 	public static void main(String[] args) {
 		//Input 1
