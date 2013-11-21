@@ -17,6 +17,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 public class JavaScriptTestingParallelWorkStealing {
 	List<String[]> rows;
+	TaskQueue queue;
 	String javaScriptFunction;
 	CSVWriter writer;
 	
@@ -32,6 +33,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			return;
 		}
 		this.rows = rows;
+		this.queue = new TaskQueue(this.rows);
 		
 		//Input 2
 		this.javaScriptFunction = javaScriptFunction;
@@ -53,7 +55,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.rows,this.javaScriptFunction, this.writer);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunction, this.writer);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -68,13 +70,34 @@ public class JavaScriptTestingParallelWorkStealing {
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
 	}
 	
-	private static class RunTests implements Runnable {
+	private class TaskQueue {
 		List<String[]> rows;
+		
+		public TaskQueue(List<String[]> rows){
+			this.rows = rows;
+		}
+		
+		public synchronized String[] pop(){
+			if (this.rows.size()>0){
+				String[] row = this.rows.get(0);
+				rows = rows.subList(1, rows.size());
+				return row;
+			}
+			return null;
+		}
+		
+		public boolean empty(){
+			return this.rows.size() == 0;
+		}
+	}
+	
+	private static class RunTests implements Runnable {
+		TaskQueue queue;
 		String javaScriptFunction;
 		CSVWriter writer;
 		
-		RunTests(List<String[]> rows, String javaScriptFunction, CSVWriter writer){
-			this.rows = rows;
+		RunTests(TaskQueue queue, String javaScriptFunction, CSVWriter writer){
+			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
 		}
@@ -83,9 +106,11 @@ public class JavaScriptTestingParallelWorkStealing {
 			WebDriver driver = new FirefoxDriver();
 
 			if (driver instanceof JavascriptExecutor) {
-				while (this.rows.size() > 0) {
-					String[] row = this.rows.get(0);
-					this.rows = this.rows.subList(1, this.rows.size());
+				while (true) {
+					String[] row = this.queue.pop();
+					if (row == null){
+						break; //the queue is empty
+					}
 					String url = row[0];
 					if (!url.startsWith("http")){url = "http://"+url;}
 			        driver.get(url);
