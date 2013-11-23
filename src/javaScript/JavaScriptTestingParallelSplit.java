@@ -2,9 +2,11 @@ package javaScript;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +22,7 @@ public class JavaScriptTestingParallelSplit {
 	String javaScriptFunction;
 	CSVWriter writer;
 	
-	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFunction, String outputFile){
+	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -34,7 +36,10 @@ public class JavaScriptTestingParallelSplit {
 		this.rows = rows;
 		
 		//Input 2
-		this.javaScriptFunction = javaScriptFunction;
+		try{
+			this.javaScriptFunction = new Scanner(new File(javaScriptFile)).useDelimiter("\\Z").next();
+		}
+		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
 		
 		//Output
 		CSVWriter writer;
@@ -116,10 +121,10 @@ public class JavaScriptTestingParallelSplit {
 	
 	public static void main(String[] args) {
 		String inputFile = "resources/input2.csv";
-		String javaScriptFunction = "var func = function(a,b){return document.title+' - '+a+' - '+b;};";
+		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output.csv";
 		
-		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFunction,outputFile);
+		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile);
 		runner.execute(8);
 	}
 

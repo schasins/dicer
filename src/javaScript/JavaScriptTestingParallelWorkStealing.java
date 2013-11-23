@@ -1,10 +1,12 @@
 package javaScript;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -21,7 +23,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	String javaScriptFunction;
 	CSVWriter writer;
 	
-	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFunction, String outputFile){
+	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFile, String outputFile){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -34,9 +36,12 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 		this.rows = rows;
 		this.queue = new TaskQueue(this.rows);
-		
+
 		//Input 2
-		this.javaScriptFunction = javaScriptFunction;
+		try{
+			this.javaScriptFunction = new Scanner(new File(javaScriptFile)).useDelimiter("\\Z").next();
+		}
+		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
 		
 		//Output
 		CSVWriter writer;
@@ -132,10 +137,10 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public static void main(String[] args) {
 		String inputFile = "resources/input2.csv";
-		String javaScriptFunction = "var func = function(a,b){return document.title+' - '+a+' - '+b;};";
+		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output.csv";
 		
-		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFunction,outputFile);
+		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFile,outputFile);
 		runner.execute(8);
 	}
 

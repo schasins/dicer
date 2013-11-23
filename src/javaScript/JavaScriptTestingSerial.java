@@ -1,10 +1,12 @@
 package javaScript;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -21,7 +23,7 @@ public class JavaScriptTestingSerial {
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
-			CSVReader reader = new CSVReader(new FileReader("resources/input.csv"), '\t');
+			CSVReader reader = new CSVReader(new FileReader("resources/input2.csv"), '\t');
 		    rows = reader.readAll();
 		}
 		catch(Exception e){
@@ -30,7 +32,11 @@ public class JavaScriptTestingSerial {
 		}
 		
 		//Input 2
-		String javaScriptFunction = "var func = function(a,b){return document.title+' - '+a+' - '+b;};";
+		String javaScriptFunction;
+		try{
+			javaScriptFunction = new Scanner(new File("resources/titleExtractor.js")).useDelimiter("\\Z").next();
+		}
+		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
 		
 		//Output
 		CSVWriter writer;
@@ -49,7 +55,9 @@ public class JavaScriptTestingSerial {
 		for (int i = 0; i<rows.size(); i++){
 			if (driver instanceof JavascriptExecutor) {
 				String[] row = rows.get(i);
-		        driver.get(row[0]);
+				String url = row[0];
+				if (!url.startsWith("http")){url = "http://"+url;}
+		        driver.get(url);
 		        for(int j = 1; j < row.length; j++){
 		            row[j] = "'"+row[j]+"'";
 		        }
