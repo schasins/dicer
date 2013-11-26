@@ -21,8 +21,9 @@ public class JavaScriptTestingParallelSplit {
 	List<String[]> rows;
 	String javaScriptFunction;
 	CSVWriter writer;
+	Boolean jquery;
 	
-	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile){
+	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile, Boolean jquery){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -52,6 +53,9 @@ public class JavaScriptTestingParallelSplit {
 			return;
 		}
 		this.writer = writer;
+		
+		//jquery
+		this.jquery = jquery;
 	}
 	
 	public void execute(int threads){
@@ -68,7 +72,7 @@ public class JavaScriptTestingParallelSplit {
 			int jump = (i < threshold) ? high : low;
 			List<String[]> rowsSlice = this.rows.subList(rowCounter, rowCounter+jump);
 			rowCounter += jump;
-			RunTests r = new RunTests(rowsSlice,this.javaScriptFunction, this.writer);
+			RunTests r = new RunTests(rowsSlice,this.javaScriptFunction, this.writer, this.jquery);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -87,11 +91,14 @@ public class JavaScriptTestingParallelSplit {
 		List<String[]> rows;
 		String javaScriptFunction;
 		CSVWriter writer;
+		Boolean jquery;
+		Boolean verbose = true;
 		
-		RunTests(List<String[]> rows, String javaScriptFunction, CSVWriter writer){
+		RunTests(List<String[]> rows, String javaScriptFunction, CSVWriter writer, Boolean jquery){
 			this.rows = rows;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
+			this.jquery = jquery;
 		}
 		
 	    public void run() {
@@ -103,11 +110,23 @@ public class JavaScriptTestingParallelSplit {
 					String url = row[0];
 					if (!url.startsWith("http")){url = "http://"+url;}
 			        driver.get(url);
+			        
+			        if (this.jquery){
+				        String jqueryCode;
+				        try{
+							jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+						}
+						catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+				        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+			        }
+			        
 			        for(int j = 1; j < row.length; j++){
 			            row[j] = "'"+row[j]+"'";
 			        }
+			        
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
 					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					if (this.verbose) {System.out.println(ans);}
 					
 					String [] ansArray = ans.toString().split("#"); 
 					this.writer.writeNext(ansArray);
@@ -123,8 +142,9 @@ public class JavaScriptTestingParallelSplit {
 		String inputFile = "resources/input2.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output.csv";
+		Boolean jquery = true;
 		
-		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile);
+		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile,jquery);
 		runner.execute(8);
 	}
 

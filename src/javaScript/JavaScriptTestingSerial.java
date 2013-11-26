@@ -49,20 +49,37 @@ public class JavaScriptTestingSerial {
 			return;
 		}
 		
+		//jquery?
+		Boolean useJquery = true;
+		
+		//verbose
+		Boolean verbose = true;
+		
 		//Execution
 		WebDriver driver = new FirefoxDriver();
-		
-		for (int i = 0; i<rows.size(); i++){
-			if (driver instanceof JavascriptExecutor) {
+
+		if (driver instanceof JavascriptExecutor) {
+			for (int i = 0; i<rows.size(); i++){
 				String[] row = rows.get(i);
 				String url = row[0];
 				if (!url.startsWith("http")){url = "http://"+url;}
 		        driver.get(url);
+		        
+		        if (useJquery){
+			        String jquery;
+			        try{
+						jquery = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+					}
+					catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+			        ((JavascriptExecutor) driver).executeScript(jquery);
+		        }
+		        
 		        for(int j = 1; j < row.length; j++){
 		            row[j] = "'"+row[j]+"'";
 		        }
 				String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
 				Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func("+argString+");");
+				if(verbose){System.out.println(ans);}
 				
 				String [] ansArray = ans.toString().split("#"); 
 				writer.writeNext(ansArray);

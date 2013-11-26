@@ -22,8 +22,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	TaskQueue queue;
 	String javaScriptFunction;
 	CSVWriter writer;
+	Boolean jquery;
 	
-	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFile, String outputFile){
+	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFile, String outputFile, Boolean jquery){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -54,13 +55,15 @@ public class JavaScriptTestingParallelWorkStealing {
 			return;
 		}
 		this.writer = writer;
+		
+		this.jquery = jquery;
 	}
 	
 	public void execute(int threads){
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunction, this.writer);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunction, this.writer, this.jquery);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -100,8 +103,10 @@ public class JavaScriptTestingParallelWorkStealing {
 		TaskQueue queue;
 		String javaScriptFunction;
 		CSVWriter writer;
+		Boolean jquery;
+		Boolean verbose = true;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, CSVWriter writer){
+		RunTests(TaskQueue queue, String javaScriptFunction, CSVWriter writer, Boolean jquery){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
@@ -119,13 +124,25 @@ public class JavaScriptTestingParallelWorkStealing {
 					String url = row[0];
 					if (!url.startsWith("http")){url = "http://"+url;}
 			        driver.get(url);
+			        
+			        if (this.jquery){
+				        String jqueryCode;
+				        try{
+							jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+						}
+						catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+				        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+			        }
+			        
 			        for(int j = 1; j < row.length; j++){
 			            row[j] = "'"+row[j]+"'";
 			        }
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
 					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					if(this.verbose){System.out.println(ans);}
 					
-					String [] ansArray = ans.toString().split("#"); 
+					String [] ansArray;
+					if (ans!=null) {ansArray = ans.toString().split("#");} else {ansArray = "".split("#");}
 					this.writer.writeNext(ansArray);
 				}
 			}
@@ -139,8 +156,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		String inputFile = "resources/input2.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output.csv";
+		Boolean jquery = true;
 		
-		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFile,outputFile);
+		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFile,outputFile,jquery);
 		runner.execute(8);
 	}
 
