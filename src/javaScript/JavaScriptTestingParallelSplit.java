@@ -125,11 +125,12 @@ public class JavaScriptTestingParallelSplit {
 			        }
 			        
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
-					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					//Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					Object ans = ((JavascriptExecutor) driver).executeScript("$('a:first').click()");
 					if (this.verbose) {System.out.println(ans);}
 					
-					String [] ansArray = ans.toString().split("#"); 
-					this.writer.writeNext(ansArray);
+					//String [] ansArray = ans.toString().split("#"); 
+					//this.writer.writeNext(ansArray);
 				}
 			}
 			

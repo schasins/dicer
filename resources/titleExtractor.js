@@ -1,10 +1,13 @@
-var func = function(){
+var func1 = function(){
 	var link = $('a:first');
 	var first_title = document.title;
 	if (link){
-		//link.click();
-		return link.html();
+		link.click();
+		return first_title+" # "+link.text();
 	}
-	//setTimeout(function(){return first_title;},1200);
 	return "no link";
+};
+
+var func2 = function(){
+    return document.title;
 };
