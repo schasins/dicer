@@ -129,6 +129,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.jquery = jquery;
 		}
 		
+		/*
 		 public Boolean waitForPageLoaded(WebDriver driver) {
 		     ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
 		        public Boolean apply(WebDriver driver) {
@@ -145,6 +146,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		      }
 		      return true;
 		 } 
+		 */
 		
 	    public void run() {
 			WebDriver driver = new FirefoxDriver();
@@ -167,16 +169,8 @@ public class JavaScriptTestingParallelWorkStealing {
 			        
 			        List<String> ansList = new ArrayList<String>();
 			        for(int i = 0; i<this.functions; i++){
-			        	//if we're on first iteration, don't need to wait for page load, else do
-			        	boolean loadJquery = this.jquery;
-				        if (i > 0){
-				        	boolean newPage = waitForPageLoaded(driver);
-				        	if (!newPage){
-				        		loadJquery = false; //don't reload it if we're still on same page
-				        	}
-				        }
 				        //load jquery if we need it and if we're on a new page
-				        if (loadJquery){
+				        if (this.jquery){
 					        String jqueryCode;
 					        try{
 								jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
