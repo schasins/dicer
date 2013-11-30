@@ -21,9 +21,14 @@ import com.google.common.base.Joiner;
 public class JavaScriptTestingParallelSplit {
 	List<String[]> rows;
 	String javaScriptFunction;
+<<<<<<< HEAD
 	PrintWriter writer;
+=======
+	CSVWriter writer;
+	Boolean jquery;
+>>>>>>> c317c4f2e144e4bf7aa0ffdda477126cf6e2f869
 	
-	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile){
+	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile, Boolean jquery){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -52,6 +57,9 @@ public class JavaScriptTestingParallelSplit {
 			return;
 		}
 		this.writer = writer;
+		
+		//jquery
+		this.jquery = jquery;
 	}
 	
 	public void execute(int threads){
@@ -75,7 +83,7 @@ public class JavaScriptTestingParallelSplit {
 			int jump = (i < threshold) ? high : low;
 			List<String[]> rowsSlice = this.rows.subList(rowCounter, rowCounter+jump);
 			rowCounter += jump;
-			RunTests r = new RunTests(rowsSlice,this.javaScriptFunction, this.writer);
+			RunTests r = new RunTests(rowsSlice,this.javaScriptFunction, this.writer, this.jquery);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -93,12 +101,21 @@ public class JavaScriptTestingParallelSplit {
 	private static class RunTests implements Runnable {
 		List<String[]> rows;
 		String javaScriptFunction;
+<<<<<<< HEAD
 		PrintWriter writer;
 		
 		RunTests(List<String[]> rows, String javaScriptFunction, PrintWriter writer){
+=======
+		CSVWriter writer;
+		Boolean jquery;
+		Boolean verbose = true;
+		
+		RunTests(List<String[]> rows, String javaScriptFunction, CSVWriter writer, Boolean jquery){
+>>>>>>> c317c4f2e144e4bf7aa0ffdda477126cf6e2f869
 			this.rows = rows;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
+			this.jquery = jquery;
 		}
 		
 	    public void run() {
@@ -117,12 +134,27 @@ public class JavaScriptTestingParallelSplit {
 					if (!url.startsWith("http")){url = "http://"+url;}
 					long t2 = System.currentTimeMillis();
 			        driver.get(url);
+<<<<<<< HEAD
 					long t3 = System.currentTimeMillis();
 					
+=======
+			        
+			        if (this.jquery){
+				        String jqueryCode;
+				        try{
+							jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+						}
+						catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+				        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+			        }
+			        
+>>>>>>> c317c4f2e144e4bf7aa0ffdda477126cf6e2f869
 			        for(int j = 1; j < row.length; j++){
 			            row[j] = "'"+row[j]+"'";
 			        }
+			        
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+<<<<<<< HEAD
 					long t4 = System.currentTimeMillis();
 					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
 					long t5 = System.currentTimeMillis();
@@ -133,6 +165,14 @@ public class JavaScriptTestingParallelSplit {
 							String.valueOf(t5 - t4) + ";";
 					
 					writer.println(ansStr);
+=======
+					//Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					Object ans = ((JavascriptExecutor) driver).executeScript("$('a:first').click()");
+					if (this.verbose) {System.out.println(ans);}
+					
+					//String [] ansArray = ans.toString().split("#"); 
+					//this.writer.writeNext(ansArray);
+>>>>>>> c317c4f2e144e4bf7aa0ffdda477126cf6e2f869
 				}
 			}
 			
@@ -144,10 +184,17 @@ public class JavaScriptTestingParallelSplit {
 	public static void main(String[] args) {
 		String inputFile = "resources/input2.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
+<<<<<<< HEAD
 		String outputFile = "resources/output-parsplit.csv";
 		
 		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile);
 		long t0 = System.currentTimeMillis();
+=======
+		String outputFile = "resources/output.csv";
+		Boolean jquery = true;
+		
+		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile,jquery);
+>>>>>>> c317c4f2e144e4bf7aa0ffdda477126cf6e2f869
 		runner.execute(8);
 		long t1 = System.currentTimeMillis();
 		System.out.println(t1 - t0);
