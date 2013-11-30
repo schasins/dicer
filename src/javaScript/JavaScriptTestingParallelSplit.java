@@ -3,6 +3,7 @@ package javaScript;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,15 +13,15 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-import com.google.common.base.Joiner;
-
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+
+import com.google.common.base.Joiner;
 
 public class JavaScriptTestingParallelSplit {
 	List<String[]> rows;
 	String javaScriptFunction;
-	CSVWriter writer;
+	PrintWriter writer;
 	
 	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile){
 		//Input 1
@@ -42,10 +43,9 @@ public class JavaScriptTestingParallelSplit {
 		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
 		
 		//Output
-		CSVWriter writer;
+		PrintWriter writer;
 		try{
-			String csv = "resources/output.csv";
-			writer = new CSVWriter(new FileWriter(csv));
+			writer = new PrintWriter(outputFile);
 		}
 		catch(Exception e){
 			System.out.println("Failed to open output file.");
@@ -55,6 +55,13 @@ public class JavaScriptTestingParallelSplit {
 	}
 	
 	public void execute(int threads){
+		String header = "title" + ";" + 
+			"start-up" + ";" + 
+			"load" + ";" + 
+			"read-args" + ";" + 
+			"execute" + ";";
+		writer.println(header);
+	
 		int jobs = rows.size();
 		if (threads > jobs){
 			threads = jobs;
@@ -86,31 +93,46 @@ public class JavaScriptTestingParallelSplit {
 	private static class RunTests implements Runnable {
 		List<String[]> rows;
 		String javaScriptFunction;
-		CSVWriter writer;
+		PrintWriter writer;
 		
-		RunTests(List<String[]> rows, String javaScriptFunction, CSVWriter writer){
+		RunTests(List<String[]> rows, String javaScriptFunction, PrintWriter writer){
 			this.rows = rows;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
 		}
 		
 	    public void run() {
+			long t0 = System.currentTimeMillis();
 			WebDriver driver = new FirefoxDriver();
+			long t1 = System.currentTimeMillis();
+
+			
+			String header = "LOAD;" + String.valueOf(t1 - t0);
+			writer.println(header);
 
 			if (driver instanceof JavascriptExecutor) {
 				for (int i = 0; i<this.rows.size(); i++){
 					String[] row = this.rows.get(i);
 					String url = row[0];
 					if (!url.startsWith("http")){url = "http://"+url;}
+					long t2 = System.currentTimeMillis();
 			        driver.get(url);
+					long t3 = System.currentTimeMillis();
+					
 			        for(int j = 1; j < row.length; j++){
 			            row[j] = "'"+row[j]+"'";
 			        }
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+					long t4 = System.currentTimeMillis();
 					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					long t5 = System.currentTimeMillis();
 					
-					String [] ansArray = ans.toString().split("#"); 
-					this.writer.writeNext(ansArray);
+					String ansStr = ans.toString() + ";0;" + 
+							String.valueOf(t3 - t2) + ";" + 
+							String.valueOf(t4 - t3) + ";" + 
+							String.valueOf(t5 - t4) + ";";
+					
+					writer.println(ansStr);
 				}
 			}
 			
@@ -122,10 +144,14 @@ public class JavaScriptTestingParallelSplit {
 	public static void main(String[] args) {
 		String inputFile = "resources/input2.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = "resources/output.csv";
+		String outputFile = "resources/output-parsplit.csv";
 		
 		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile);
+		long t0 = System.currentTimeMillis();
 		runner.execute(8);
+		long t1 = System.currentTimeMillis();
+		System.out.println(t1 - t0);
+		System.out.println("milliseconds");
 	}
 
 }
