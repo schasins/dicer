@@ -16,12 +16,12 @@ import au.com.bytecode.opencsv.CSVReader;
 
 import com.google.common.base.Joiner;
 
-public class JavaScriptTestingParallelSplit {
+public class JavaScriptTestingParallelSplitTime {
 	List<String[]> rows;
 	String javaScriptFunction;
 	PrintWriter writer;
 	
-	JavaScriptTestingParallelSplit(String inputFile, String javaScriptFile, String outputFile){
+	JavaScriptTestingParallelSplitTime(String inputFile, String javaScriptFile, String outputFile){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -144,7 +144,7 @@ public class JavaScriptTestingParallelSplit {
 		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output-parsplit.csv";
 		
-		JavaScriptTestingParallelSplit runner = new JavaScriptTestingParallelSplit(inputFile,javaScriptFile,outputFile);
+		JavaScriptTestingParallelSplitTime runner = new JavaScriptTestingParallelSplitTime(inputFile,javaScriptFile,outputFile);
 		long t0 = System.currentTimeMillis();
 		runner.execute(8);
 		long t1 = System.currentTimeMillis();
