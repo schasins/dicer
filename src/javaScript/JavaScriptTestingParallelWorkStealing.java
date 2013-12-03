@@ -11,6 +11,9 @@ import java.util.Scanner;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Joiner;
 
@@ -20,10 +23,12 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class JavaScriptTestingParallelWorkStealing {
 	List<String[]> rows;
 	TaskQueue queue;
-	String javaScriptFunction;
+	String javaScriptFunctions;
+	int functions;
 	CSVWriter writer;
+	Boolean jquery;
 	
-	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFile, String outputFile){
+	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFile, String outputFile, Boolean jquery){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -39,9 +44,19 @@ public class JavaScriptTestingParallelWorkStealing {
 
 		//Input 2
 		try{
-			this.javaScriptFunction = new Scanner(new File(javaScriptFile)).useDelimiter("\\Z").next();
+			this.javaScriptFunctions = new Scanner(new File(javaScriptFile)).useDelimiter("\\Z").next();
 		}
 		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
+		this.functions = 0;
+		while(true){
+			if(this.javaScriptFunctions.contains("var func"+(this.functions+1))){
+				this.functions++;
+			}
+			else{
+				break;
+			}
+		}
+		System.out.println("functions: "+this.functions);
 		
 		//Output
 		CSVWriter writer;
@@ -54,13 +69,15 @@ public class JavaScriptTestingParallelWorkStealing {
 			return;
 		}
 		this.writer = writer;
+		
+		this.jquery = jquery;
 	}
 	
 	public void execute(int threads){
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunction, this.writer);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.functions, this.writer, this.jquery);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -99,13 +116,37 @@ public class JavaScriptTestingParallelWorkStealing {
 	private static class RunTests implements Runnable {
 		TaskQueue queue;
 		String javaScriptFunction;
+		int functions;
 		CSVWriter writer;
+		Boolean jquery;
+		Boolean verbose = true;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, CSVWriter writer){
+		RunTests(TaskQueue queue, String javaScriptFunction, int functions, CSVWriter writer, Boolean jquery){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
+			this.functions = functions;
+			this.jquery = jquery;
 		}
+		
+		/*
+		 public Boolean waitForPageLoaded(WebDriver driver) {
+		     ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
+		        public Boolean apply(WebDriver driver) {
+		          return ((JavascriptExecutor)driver).executeScript("return document.readyState").equals("complete");
+		        }
+		      };
+
+		     Wait<WebDriver> wait = new WebDriverWait(driver,30);
+		      try {
+		              wait.until(expectation);
+		      } catch(Throwable error) {
+		              System.out.println("Timeout waiting for Page Load Request to complete.");
+		              return false;
+		      }
+		      return true;
+		 } 
+		 */
 		
 	    public void run() {
 			WebDriver driver = new FirefoxDriver();
@@ -119,14 +160,33 @@ public class JavaScriptTestingParallelWorkStealing {
 					String url = row[0];
 					if (!url.startsWith("http")){url = "http://"+url;}
 			        driver.get(url);
+			        
+			        //make the argString, since that will be the same across pages
 			        for(int j = 1; j < row.length; j++){
 			            row[j] = "'"+row[j]+"'";
 			        }
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
-					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
-					
-					String [] ansArray = ans.toString().split("#"); 
-					this.writer.writeNext(ansArray);
+			        
+			        List<String> ansList = new ArrayList<String>();
+			        for(int i = 0; i<this.functions; i++){
+				        //load jquery if we need it and if we're on a new page
+				        if (this.jquery){
+					        String jqueryCode;
+					        try{
+								jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+							}
+							catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+					        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+				        }
+				        
+				        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
+				        Object ans = ((JavascriptExecutor) driver).executeAsyncScript(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
+						if(this.verbose){System.out.println(ans);}
+						
+						ArrayList<String> ansListPortion = new ArrayList<String>(Arrays.asList(ans.toString().split("#")));
+						if (ans!=null) {ansList.addAll(ansListPortion);}
+			        }
+					this.writer.writeNext(ansList.toArray(new String[ansList.size()]));
 				}
 			}
 			
@@ -139,8 +199,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		String inputFile = "resources/input2.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output.csv";
+		Boolean jquery = true;
 		
-		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFile,outputFile);
+		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFile,outputFile,jquery);
 		runner.execute(8);
 	}
 
