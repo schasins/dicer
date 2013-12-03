@@ -119,6 +119,9 @@ public class JavaScriptTestingParallelWorkStealingTime {
 			WebDriver driver = new FirefoxDriver();
 			long t1 = System.currentTimeMillis();
 
+			String header = "LOAD;" + String.valueOf(t1 - t0);
+			writer.println(header);
+			
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
 					String[] row = this.queue.pop();
@@ -136,7 +139,7 @@ public class JavaScriptTestingParallelWorkStealingTime {
 			        }
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
 					long t4 = System.currentTimeMillis();
-					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func2("+argString+");");
 					long t5 = System.currentTimeMillis();
 					
 					String ansStr = ans.toString() + ";0;" + 

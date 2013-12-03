@@ -122,7 +122,7 @@ public class JavaScriptTestingParallelSplitTime {
 			        }
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
 					long t4 = System.currentTimeMillis();
-					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
+					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func2("+argString+");");
 					long t5 = System.currentTimeMillis();
 					
 					String ansStr = ans.toString() + ";0;" + 
