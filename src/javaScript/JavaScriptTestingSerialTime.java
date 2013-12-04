@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import com.google.common.base.Joiner;
@@ -24,7 +26,7 @@ public class JavaScriptTestingSerialTime {
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
-			CSVReader reader = new CSVReader(new FileReader("resources/input2.csv"), '\t');
+			CSVReader reader = new CSVReader(new FileReader("resources/input.csv"), '\t');
 		    rows = reader.readAll();
 		}
 		catch(Exception e){
@@ -38,11 +40,11 @@ public class JavaScriptTestingSerialTime {
 			javaScriptFunction = new Scanner(new File("resources/titleExtractor.js")).useDelimiter("\\Z").next();
 		}
 		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
-		
+
 		//Output
+		String csv = "resources/output-seq.csv";
 		PrintWriter writer;
 		try{
-			String csv = "resources/output-seq.csv";
 			writer = new PrintWriter(csv);
 		}
 		catch(Exception e){
@@ -53,50 +55,55 @@ public class JavaScriptTestingSerialTime {
 		//Execution
 		long t0 = System.currentTimeMillis();
 		WebDriver driver = new FirefoxDriver();
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 		long t1 = System.currentTimeMillis();
 
-		String header = "title" + ";" + 
-				"start-up" + ";" + 
-				"load" + ";" + 
-				"read-args" + ";" + 
-				"execute" + ";";
-		writer.println(header);
-		header = "LOAD;" + String.valueOf(t1 - t0);
-		writer.println(header);
+
+		writer.println("url;title;start-up;load;execute");
+		writer.println("LOAD;;" + String.valueOf(t1 - t0));
 		
 		for (int i = 0; i<rows.size(); i++){
 			if (driver instanceof JavascriptExecutor) {
 				String[] row = rows.get(i);
 				String url = row[0];
 				if (!url.startsWith("http")){url = "http://"+url;}
-				long t2 = System.currentTimeMillis();
-		        driver.get(url);
-				long t3 = System.currentTimeMillis();
+				try {
+					long t2 = System.currentTimeMillis();
+					driver.get(url);
+					long t3 = System.currentTimeMillis();
 				
-		        for(int j = 1; j < row.length; j++){
-		            row[j] = "'"+row[j]+"'";
-		        }
-				String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
-				long t4 = System.currentTimeMillis();
-				Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func2("+argString+");");
-				long t5 = System.currentTimeMillis();
+					for(int j = 1; j < row.length; j++){
+						row[j] = "'"+row[j]+"'";
+					}
+					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+					Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func2("+argString+");");
+					long t4 = System.currentTimeMillis();
 				
-				String ansStr = ans.toString() + ";0;" + 
-						String.valueOf(t3 - t2) + ";" + 
-						String.valueOf(t4 - t3) + ";" + 
-						String.valueOf(t5 - t4) + ";";
+					String ansStr = url + ";" + ans.toString() + ";0;" + 
+							String.valueOf(t3 - t2) + ";" + 
+							String.valueOf(t4 - t3) + ";";
 				
-				writer.println(ansStr);
+					writer.println(ansStr);
+				}
+				catch(WebDriverException e){
+					System.out.println(url + ": " + e.toString());
+					writer.println(url + ";" + e.toString().split("\n")[0]);
+				}
 			}
 		}
 		
-		//Close output writer
-		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}
         //Close the browser
         driver.quit();
 		long stop = System.currentTimeMillis();
-		System.out.println(stop - t0);
-		System.out.println("milliseconds");
+
+		//Close output writer
+		try{
+			writer.println("TOTAL;" + String.valueOf(stop-t0)); 
+			writer.close();
+		}
+		catch(Exception e){
+			System.out.println("Not able to clear output file.");
+		}
 	}
 
 }
