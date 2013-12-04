@@ -28,7 +28,10 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	
-	JavaScriptTestingParallelWorkStealing(String inputFile, String javaScriptFile, String outputFile, Boolean jquery){
+	JavaScriptTestingParallelWorkStealing(){
+	}
+	
+	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -71,6 +74,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		this.writer = writer;
 		
 		this.jquery = jquery;
+		
+		this.execute(threads);
 	}
 	
 	public void execute(int threads){
@@ -90,6 +95,14 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
+	}
+	
+	public void startSession(){
+		
+	}
+	
+	public void endSession(){
+		
 	}
 	
 	private class TaskQueue {
@@ -167,7 +180,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			        }
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
 			        
-			        List<String> ansList = new ArrayList<String>();
+			        List<List<String>> ansList = new ArrayList<List<String>>();
 			        for(int i = 0; i<this.functions; i++){
 				        //load jquery if we need it and if we're on a new page
 				        if (this.jquery){
@@ -183,10 +196,14 @@ public class JavaScriptTestingParallelWorkStealing {
 				        Object ans = ((JavascriptExecutor) driver).executeAsyncScript(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
 						if(this.verbose){System.out.println(ans);}
 						
-						ArrayList<String> ansListPortion = new ArrayList<String>(Arrays.asList(ans.toString().split("#")));
-						if (ans!=null) {ansList.addAll(ansListPortion);}
+						if(i == (this.functions-1)){
+							ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
+							for(int j = 0; j<ansRows.size(); j++){
+								String ansRow = ansRows.get(j);
+								this.writer.writeNext(ansRow.split("%$%"));
+							}
+						}
 			        }
-					this.writer.writeNext(ansList.toArray(new String[ansList.size()]));
 				}
 			}
 			
@@ -200,9 +217,12 @@ public class JavaScriptTestingParallelWorkStealing {
 		String javaScriptFile = "resources/titleExtractor.js";
 		String outputFile = "resources/output.csv";
 		Boolean jquery = true;
+		int threads = 8;
 		
-		JavaScriptTestingParallelWorkStealing runner = new JavaScriptTestingParallelWorkStealing(inputFile,javaScriptFile,outputFile,jquery);
-		runner.execute(8);
+		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
+		system.startSession();
+		system.stage(inputFile,javaScriptFile,outputFile,jquery,threads);
+		system.endSession();
 	}
 
 }
