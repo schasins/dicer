@@ -193,7 +193,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				        }
 				        
 				        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
-				        Object ans = ((JavascriptExecutor) driver).executeAsyncScript(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
+				        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
 						if(this.verbose){System.out.println(ans);}
 						
 						if(i == (this.functions-1)){
