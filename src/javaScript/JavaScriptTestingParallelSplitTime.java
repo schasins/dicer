@@ -2,14 +2,17 @@ package javaScript;
 
 import java.io.FileReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -53,13 +56,9 @@ public class JavaScriptTestingParallelSplitTime {
 	}
 	
 	public void execute(int threads){
-		String header = "title" + ";" + 
-			"start-up" + ";" + 
-			"load" + ";" + 
-			"read-args" + ";" + 
-			"execute" + ";";
-		writer.println(header);
-	
+		writer.println("url;title;start-up;load;execute");
+		
+		long start = System.currentTimeMillis();
 		int jobs = rows.size();
 		if (threads > jobs){
 			threads = jobs;
@@ -83,6 +82,11 @@ public class JavaScriptTestingParallelSplitTime {
 		for (Thread thread : threadList) {
 		    try {thread.join();} catch (InterruptedException e) {System.out.println("Could not join thread.");}
 		}
+
+		long stop = System.currentTimeMillis();
+		writer.println("TOTAL;" + String.valueOf(stop-start)); 
+		System.out.println("TOTAL (ms):");
+		System.out.println(stop-start);
 		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
@@ -95,17 +99,18 @@ public class JavaScriptTestingParallelSplitTime {
 		
 		RunTests(List<String[]> rows, String javaScriptFunction, PrintWriter writer){
 			this.rows = rows;
-			this.javaScriptFunction = javaScriptFunction;
+			this.javaScriptFunction = javaScriptFunction; 
 			this.writer = writer;
 		}
 		
 	    public void run() {
 			long t0 = System.currentTimeMillis();
 			WebDriver driver = new FirefoxDriver();
+			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 			long t1 = System.currentTimeMillis();
 
 			
-			String header = "LOAD;" + String.valueOf(t1 - t0);
+			String header = "LOAD;;" + String.valueOf(t1 - t0);
 			writer.println(header);
 
 			if (driver instanceof JavascriptExecutor) {
@@ -113,43 +118,44 @@ public class JavaScriptTestingParallelSplitTime {
 					String[] row = this.rows.get(i);
 					String url = row[0];
 					if (!url.startsWith("http")){url = "http://"+url;}
-					long t2 = System.currentTimeMillis();
-			        driver.get(url);
-					long t3 = System.currentTimeMillis();
+					try {
+						long t2 = System.currentTimeMillis();
+						driver.get(url);
+						long t3 = System.currentTimeMillis();
 					
-			        for(int j = 1; j < row.length; j++){
-			            row[j] = "'"+row[j]+"'";
-			        }
-					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
-					long t4 = System.currentTimeMillis();
-					Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func("+argString+");");
-					long t5 = System.currentTimeMillis();
+						for(int j = 1; j < row.length; j++){
+							row[j] = "'"+row[j]+"'";
+						}
+						String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+						Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func2("+argString+");");
+						long t4 = System.currentTimeMillis();
 					
-					String ansStr = ans.toString() + ";0;" + 
-							String.valueOf(t3 - t2) + ";" + 
-							String.valueOf(t4 - t3) + ";" + 
-							String.valueOf(t5 - t4) + ";";
+						String ansStr = url + ";" + ans.toString() + ";0;" + 
+								String.valueOf(t3 - t2) + ";" + 
+								String.valueOf(t4 - t3) + ";";
 					
-					writer.println(ansStr);
+						writer.println(ansStr);
+					}
+					catch(WebDriverException e){
+						System.out.println(url + ": " + e.toString());
+						writer.println(url + ";" + e.toString().split("\n")[0]);
+					}
 				}
 			}
 			
 	        //Close the browser
 	        driver.quit();
+	        System.out.println("Thread finishes.");
 	    }
 	}
 	
 	public static void main(String[] args) {
-		String inputFile = "resources/input2.csv";
+		String inputFile = "resources/input.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = "resources/output-parsplit.csv";
+		String outputFile = "resources/output-split.csv";
 		
 		JavaScriptTestingParallelSplitTime runner = new JavaScriptTestingParallelSplitTime(inputFile,javaScriptFile,outputFile);
-		long t0 = System.currentTimeMillis();
 		runner.execute(8);
-		long t1 = System.currentTimeMillis();
-		System.out.println(t1 - t0);
-		System.out.println("milliseconds");
 	}
 
 }
