@@ -167,6 +167,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
 					String[] row = this.queue.pop();
+					//System.out.println(Arrays.toString(row));
 					if (row == null){
 						break; //the queue is empty
 					}
@@ -212,12 +213,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			
 	        //Close the browser
 	        driver.quit();
-	        try {
-				this.writer.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 	    }
 	}
 	
@@ -235,7 +230,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		String output3 = "resources/output3.csv";
 		
 		Boolean jquery = false;
-		int threads = 8;
+		int threads = 4;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();

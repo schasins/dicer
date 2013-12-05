@@ -4,6 +4,30 @@ var snapshot = null;
 var snapshotNode = null;
 var snapshotBranch = null;
 
+	function nodeToXPath(element) {
+	//  we want the full path, not one that uses the id since ids can change
+	//  if (element.id !== '')
+	//    return 'id("' + element.id + '")';
+	  if (element.tagName.toLowerCase() === 'html')
+	    return element.tagName;
+
+	  // if there is no parent node then this element has been disconnected
+	  // from the root of the DOM tree
+	  if (!element.parentNode)
+	    return '';
+
+	  var ix = 0;
+	  var siblings = element.parentNode.childNodes;
+	  for (var i = 0, ii = siblings.length; i < ii; i++) {
+	    var sibling = siblings[i];
+	    if (sibling === element)
+	      return nodeToXPath(element.parentNode) + '/' + element.tagName +
+		     '[' + (ix + 1) + ']';
+	    if (sibling.nodeType === 1 && sibling.tagName === element.tagName)
+	      ix++;
+	  }
+	}
+
 (function() {
   var ignoreTags = {'script': true, 'style': true};
 
@@ -200,13 +224,46 @@ var saveTargetInfo;
     targetInfo.snapshot = snapshotNode(target);
     targetInfo.branch = snapshotBranch(target);
     return JSON.stringify(targetInfo);
-  }
+  };
 
 })()
+
+/******* XPATH TO NODE code *********/
+
+    // convert an xpath expression to an array of DOM nodes
+	function xPathToNodes(xpath) {
+	  try {
+	    var q = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE,
+		                      null);
+	    var results = [];
+
+	    var next = q.iterateNext();
+	    while (next) {
+	      results.push(next);
+	      next = q.iterateNext();
+	    }
+	    return results;
+	  } catch (e) {
+	    return null;
+	  }
+	  return [];
+	}
+
+	function xPathToNode(xpath) {
+	  var nodes = xPathToNodes(xpath);
+	  //if we don't successfully find nodes, let's alert
+	  if (nodes.length != 1)
+	    return null;
+
+	  if (nodes.length >= 1)
+	    return nodes[0];
+	  else
+	    return null;
+	}
 
 var func1 = function(urlArg,xpath,url1,url2){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
 
 	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node);
-}
+};
