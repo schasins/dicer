@@ -3,6 +3,7 @@ package javaScript;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,8 +65,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		//Output
 		CSVWriter writer;
 		try{
-			String csv = "resources/output.csv";
-			writer = new CSVWriter(new FileWriter(csv));
+			writer = new CSVWriter(new FileWriter(outputFile));
 		}
 		catch(Exception e){
 			System.out.println("Failed to open output file.");
@@ -194,13 +194,16 @@ public class JavaScriptTestingParallelWorkStealing {
 				        
 				        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
 				        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
-						if(this.verbose){System.out.println(ans);}
+						
 						
 						if(i == (this.functions-1)){
-							ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
-							for(int j = 0; j<ansRows.size(); j++){
-								String ansRow = ansRows.get(j);
-								this.writer.writeNext(ansRow.split("%$%"));
+							if (ans != null){
+								ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
+								for(int j = 0; j<ansRows.size(); j++){
+									String ansRow = ansRows.get(j);
+									//if(this.verbose){System.out.println(ansRow);}
+									this.writer.writeNext(ansRow.split("<,>"));
+								}
 							}
 						}
 			        }
@@ -209,19 +212,36 @@ public class JavaScriptTestingParallelWorkStealing {
 			
 	        //Close the browser
 	        driver.quit();
+	        try {
+				this.writer.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    }
 	}
 	
 	public static void main(String[] args) {
-		String inputFile = "resources/input2.csv";
-		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = "resources/output.csv";
-		Boolean jquery = true;
+		String input1 = "resources/input1-small.csv";
+		String javaScript1 = "resources/getXpaths.js";
+		String output1 = "resources/output1.csv";
+
+		String input2 = "resources/output1.csv";
+		String javaScript2 = "resources/filter.js";
+		String output2 = "resources/output2.csv";
+
+		String input3 = "resources/output2.csv";
+		String javaScript3 = "resources/nodeSaving.js";
+		String output3 = "resources/output3.csv";
+		
+		Boolean jquery = false;
 		int threads = 8;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();
-		system.stage(inputFile,javaScriptFile,outputFile,jquery,threads);
+		system.stage(input1,javaScript1,output1,jquery,threads);
+		system.stage(input2,javaScript2,output2,jquery,threads);
+		system.stage(input3,javaScript3,output3,jquery,threads);
 		system.endSession();
 	}
 
