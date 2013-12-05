@@ -174,12 +174,12 @@ public class JavaScriptTestingParallelWorkStealing {
 					if (!url.startsWith("http")){url = "http://"+url;}
 			        driver.get(url);
 			        
-			        //make the argString, since that will be the same across pages
-			        for(int j = 1; j < row.length; j++){
+			        //make the argString, since that will be the same across subalgorithms
+			        for(int j = 0; j < row.length; j++){
 			            row[j] = "'"+row[j]+"'";
 			        }
-					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
-			        
+					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
+					
 			        List<List<String>> ansList = new ArrayList<List<String>>();
 			        for(int i = 0; i<this.functions; i++){
 				        //load jquery if we need it and if we're on a new page

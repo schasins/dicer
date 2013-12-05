@@ -203,3 +203,10 @@ var saveTargetInfo;
   }
 
 })()
+
+var func1 = function(urlArg,xpath,url1,url2){
+	var node = xPathToNode(xpath);
+	if (node == null) { return; }
+
+	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node);
+}

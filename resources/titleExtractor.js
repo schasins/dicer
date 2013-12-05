@@ -1,3 +1,4 @@
+/*
 var func1 = function(){
 	var link = $('a:first');
 	var first_title = document.title;
@@ -7,7 +8,8 @@ var func1 = function(){
 	}
 	return "no link";
 };
+*/
 
-var func2 = function(){
+var func1 = function(){
     return document.title;
 };
