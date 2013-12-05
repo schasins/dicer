@@ -1,11 +1,12 @@
 var output = "";
 var url = "";
 var first = true;
+var actualUrl = window.location.href;
 
 function walkTheDOM(node, xpath) {
 
     if (!first){
-    	output+=("@#@"+url+"<,>"+xpath);
+    	output+=("@#@"+url+"<,>"+xpath+"<,>"+actualUrl);
     	}
     else {
        first = false;
