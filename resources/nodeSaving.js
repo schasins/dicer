@@ -261,7 +261,7 @@ var saveTargetInfo;
 	    return null;
 	}
 
-var func1 = function(urlArg,xpath,url1,url2){
+var func_a1 = function(urlArg,xpath,url1,url2){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
 

@@ -30,7 +30,7 @@ function walkTheDOM(node, xpath) {
     }
 }
 
-var func1 = function(urlArg){
+var func_a1 = function(urlArg){
   url = urlArg;
   var element = document.body;
   walkTheDOM(element,"HTML/BODY");
