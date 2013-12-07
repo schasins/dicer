@@ -79,11 +79,8 @@ public class JavaScriptTestingSerialTime {
 						row[j] = "'"+row[j]+"'";
 					}
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
-					Thread.sleep(3000);
-					System.out.println("before execute");
 					Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func2("+argString+");");
 					long t4 = System.currentTimeMillis();
-					System.out.println("after execute");
 				
 					String ansStr = url + ";" + ans.toString() + ";0;" + 
 							String.valueOf(t3 - t2) + ";" + 
@@ -94,9 +91,6 @@ public class JavaScriptTestingSerialTime {
 				catch(WebDriverException e){
 					System.out.println(url + ": " + e.toString());
 					writer.println(url + ";" + e.toString().split("\n")[0]);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		}
