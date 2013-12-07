@@ -166,7 +166,7 @@ public class JavaScriptTestingParallelWorkStealingTime {
 	public static void main(String[] args) {
 		String inputFile = "resources/input.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = "resources/output-loadbalance.csv";
+		String outputFile = args[0];
 		
 		JavaScriptTestingParallelWorkStealingTime runner = new JavaScriptTestingParallelWorkStealingTime(inputFile,javaScriptFile,outputFile);
 		runner.execute(8);

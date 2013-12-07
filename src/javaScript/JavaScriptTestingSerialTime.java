@@ -42,7 +42,8 @@ public class JavaScriptTestingSerialTime {
 		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
 
 		//Output
-		String csv = "resources/output-seq.csv";
+		String csv = args[0];
+		//String csv = "resources/output-seq.csv";
 		PrintWriter writer;
 		try{
 			writer = new PrintWriter(csv);
@@ -69,15 +70,20 @@ public class JavaScriptTestingSerialTime {
 				if (!url.startsWith("http")){url = "http://"+url;}
 				try {
 					long t2 = System.currentTimeMillis();
+					System.out.println("before load");
 					driver.get(url);
+					System.out.println("after load");
 					long t3 = System.currentTimeMillis();
 				
 					for(int j = 1; j < row.length; j++){
 						row[j] = "'"+row[j]+"'";
 					}
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+					Thread.sleep(3000);
+					System.out.println("before execute");
 					Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func2("+argString+");");
 					long t4 = System.currentTimeMillis();
+					System.out.println("after execute");
 				
 					String ansStr = url + ";" + ans.toString() + ";0;" + 
 							String.valueOf(t3 - t2) + ";" + 
@@ -88,6 +94,9 @@ public class JavaScriptTestingSerialTime {
 				catch(WebDriverException e){
 					System.out.println(url + ": " + e.toString());
 					writer.println(url + ";" + e.toString().split("\n")[0]);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}

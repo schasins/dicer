@@ -152,7 +152,7 @@ public class JavaScriptTestingParallelSplitTime {
 	public static void main(String[] args) {
 		String inputFile = "resources/input.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = "resources/output-split.csv";
+		String outputFile = args[0];
 		
 		JavaScriptTestingParallelSplitTime runner = new JavaScriptTestingParallelSplitTime(inputFile,javaScriptFile,outputFile);
 		runner.execute(8);
