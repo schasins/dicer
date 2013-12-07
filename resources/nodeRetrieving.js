@@ -1,6 +1,9 @@
 var getTarget;
 var getTargetFunction;
 var targetFunctions;
+var getTargetId;
+var getTargetClass;
+var xPathToNode;
 
 (function() {
 
@@ -56,7 +59,7 @@ var targetFunctions;
 	  return [currentNode];
 	}
 
-	function xPathToNode(xpath) {
+	xPathToNode = function(xpath) {
 	  var nodes = xPathToNodes(xpath);
 	  //if we don't successfully find nodes, let's alert
 	  if (nodes.length != 1)
@@ -148,7 +151,7 @@ var targetFunctions;
     return helper(split, split.length - 1);
   }
 
-  function getTargetClass(targetInfo) {
+  getTargetClass = function(targetInfo) {
     var className = targetInfo.snapshot.prop.className;
     if (className) {
       //xPathToNodes("//*[@class='" + className + "']");
@@ -161,16 +164,16 @@ var targetFunctions;
           selector += '.' + classes[i];
       }
 
-      return $.makeArray($(selector));
+      return document.querySelectorAll(selector);
     }
     return [];
   }
 
-  function getTargetId(targetInfo) {
+  getTargetId = function(targetInfo) {
     var id = targetInfo.snapshot.prop.id;
     if (id) {
       var selector = "#" + id.trim().replace(':', '\\:');
-      return $.makeArray($(selector));
+      return document.querySelectorAll(selector);
     }
     return [];
   }
@@ -234,8 +237,74 @@ var targetFunctions;
 
 })()
 
-var func1 = function(targetInfoString){
+function simulateClick(node) {
+    var evt = document.createEvent("MouseEvents");
+    evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0,
+        false, false, false, false, 0, null);
+
+    node.dispatchEvent(evt);
+}
+
+//an algorithm for pure bookkeeping
+
+var func_a1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	return url+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+targetInfoString+"<,>"+iMacrosTargetInfoString;
+};
+
+//the PLDI paper algorithm
+
+var func_b1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTarget(targetInfo);
-	$(target).click();
+	simulateClick(target);
+};
+
+var func_b2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+//the ID algorithm
+
+var func_c1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetId(targetInfo);
+	if (target.length > 0){
+		simulateClick(target[0]);
+	}
+	return; //won't click, so we'll get that the url is the same as the original
+};
+
+var func_c2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+//the class algorithm
+
+var func_d1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetClass(targetInfo);
+	if (target.length > 0){
+		simulateClick(target[0]);
+	}
+	return; //won't click, so we'll get that the url is the same as the original
+};
+
+var func_d2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+//the xpath algorithm
+
+var func_e1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var node = xPathToNode(xpath);
+	if (node == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(node);
+};
+
+var func_e2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
