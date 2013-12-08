@@ -28,7 +28,7 @@ public class JavaScriptTestingSerialProxy {
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
-			CSVReader reader = new CSVReader(new FileReader("resources/input2.csv"), '\t');
+			CSVReader reader = new CSVReader(new FileReader("resources/input.csv"), '\t');
 		    rows = reader.readAll();
 		}
 		catch(Exception e){

@@ -14,6 +14,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.base.Joiner;
 
@@ -118,8 +120,14 @@ public class JavaScriptTestingParallelWorkStealingTime {
 		
 	    public void run() {
 			long t0 = System.currentTimeMillis();
-			WebDriver driver = new FirefoxDriver();
-			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+			String PROXY = "localhost:8000";
+			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
+			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
+			DesiredCapabilities cap = new DesiredCapabilities();
+			cap.setCapability(CapabilityType.PROXY, proxy);
+			
+			WebDriver driver = new FirefoxDriver(cap);
+			driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
 			long t1 = System.currentTimeMillis();
 
 			String header = "LOAD;" + String.valueOf(t1 - t0);
@@ -154,6 +162,8 @@ public class JavaScriptTestingParallelWorkStealingTime {
 					catch(WebDriverException e){
 						System.out.println(url + ": " + e.toString());
 						writer.println(url + ";" + e.toString().split("\n")[0]);
+						driver.quit();
+						driver = new FirefoxDriver(cap);
 					}
 				}
 			}
@@ -169,7 +179,7 @@ public class JavaScriptTestingParallelWorkStealingTime {
 		String outputFile = args[0];
 		
 		JavaScriptTestingParallelWorkStealingTime runner = new JavaScriptTestingParallelWorkStealingTime(inputFile,javaScriptFile,outputFile);
-		runner.execute(8);
+		runner.execute(4);
 	}
 
 }

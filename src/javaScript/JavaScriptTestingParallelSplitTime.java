@@ -139,6 +139,8 @@ public class JavaScriptTestingParallelSplitTime {
 					catch(WebDriverException e){
 						System.out.println(url + ": " + e.toString());
 						writer.println(url + ";" + e.toString().split("\n")[0]);
+						driver.quit();
+						driver = new FirefoxDriver();
 					}
 				}
 			}
