@@ -44,7 +44,7 @@ public class JavaScriptTestingSerialProxy {
 		catch(Exception e){System.out.println("Failed to open JavaScript input file."); return;}
 
 		//Output
-		String csv = "resources/output-proxy.csv";
+		String csv = "resources/output-proxy-sina.csv";
 		PrintWriter writer;
 		try{
 			writer = new PrintWriter(csv);
@@ -63,7 +63,7 @@ public class JavaScriptTestingSerialProxy {
 		
 		long t0 = System.currentTimeMillis();
 		WebDriver driver = new FirefoxDriver(cap);
-		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
 		long t1 = System.currentTimeMillis();
 
 
@@ -77,14 +77,19 @@ public class JavaScriptTestingSerialProxy {
 				if (!url.startsWith("http")){url = "http://"+url;}
 				try {
 					long t2 = System.currentTimeMillis();
+					System.out.println("before load");
+					System.out.println(url);
 					driver.get(url);
+					System.out.println("after load");
 					long t3 = System.currentTimeMillis();
 				
 					for(int j = 1; j < row.length; j++){
 						row[j] = "'"+row[j]+"'";
 					}
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+					System.out.println("before exec");
 					Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func2("+argString+");");
+					System.out.println("after exec");
 					long t4 = System.currentTimeMillis();
 				
 					String ansStr = url + ";" + ans.toString() + ";0;" + 
@@ -96,6 +101,8 @@ public class JavaScriptTestingSerialProxy {
 				catch(WebDriverException e){
 					System.out.println(url + ": " + e.toString());
 					writer.println(url + ";" + e.toString().split("\n")[0]);
+					driver.quit();
+					driver = new FirefoxDriver(cap);
 				}
 			}
 		}
