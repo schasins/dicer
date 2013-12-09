@@ -127,10 +127,9 @@ public class JavaScriptTestingParallelWorkStealingTime {
 			cap.setCapability(CapabilityType.PROXY, proxy);
 			
 			WebDriver driver = new FirefoxDriver();
-			driver.manage().timeouts()
-				.implicitlyWait(10, TimeUnit.SECONDS)
-				.pageLoadTimeout(10, TimeUnit.SECONDS)
-				.setScriptTimeout(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 			long t1 = System.currentTimeMillis();
 
 			String header = "LOAD;" + String.valueOf(t1 - t0);
@@ -167,6 +166,9 @@ public class JavaScriptTestingParallelWorkStealingTime {
 						writer.println(url + ";" + e.toString().split("\n")[0]);
 						driver.quit();
 						driver = new FirefoxDriver();
+						driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+						driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+						driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 					}
 				}
 			}
@@ -179,7 +181,7 @@ public class JavaScriptTestingParallelWorkStealingTime {
 	public static void main(String[] args) {
 		String inputFile = "resources/input.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = args[0];
+		String outputFile = "resources/output.csv";
 		
 		JavaScriptTestingParallelWorkStealingTime runner = new JavaScriptTestingParallelWorkStealingTime(inputFile,javaScriptFile,outputFile);
 		runner.execute(8);
