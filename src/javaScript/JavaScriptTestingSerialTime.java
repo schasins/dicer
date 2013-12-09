@@ -56,7 +56,10 @@ public class JavaScriptTestingSerialTime {
 		//Execution
 		long t0 = System.currentTimeMillis();
 		WebDriver driver = new FirefoxDriver();
-		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.manage().timeouts()
+			.implicitlyWait(10, TimeUnit.SECONDS)
+			.pageLoadTimeout(10, TimeUnit.SECONDS)
+			.setScriptTimeout(10, TimeUnit.SECONDS);
 		long t1 = System.currentTimeMillis();
 
 
@@ -79,7 +82,9 @@ public class JavaScriptTestingSerialTime {
 						row[j] = "'"+row[j]+"'";
 					}
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 1, row.length));
+					System.out.println("before exec");
 					Object ans = ((JavascriptExecutor) driver).executeScript(javaScriptFunction+" return func2("+argString+");");
+					System.out.println("after exec");
 					long t4 = System.currentTimeMillis();
 				
 					String ansStr = url + ";" + ans.toString() + ";0;" + 
@@ -91,6 +96,8 @@ public class JavaScriptTestingSerialTime {
 				catch(WebDriverException e){
 					System.out.println(url + ": " + e.toString());
 					writer.println(url + ";" + e.toString().split("\n")[0]);
+					driver.quit();
+					driver = new FirefoxDriver();
 				}
 			}
 		}
