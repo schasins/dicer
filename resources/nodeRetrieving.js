@@ -21,7 +21,7 @@ var xPathToNode;
 	    }
 	    return results;
 	  } catch (e) {
-	    getLog('misc').error('xPath throws error when evaluated', xpath);
+	    //getLog('misc').error('xPath throws error when evaluated', xpath);
 	  }
 	  return [];
 	}
@@ -62,8 +62,9 @@ var xPathToNode;
 	xPathToNode = function(xpath) {
 	  var nodes = xPathToNodes(xpath);
 	  //if we don't successfully find nodes, let's alert
-	  if (nodes.length != 1)
-	    getLog('misc').error("xpath doesn't return strictly one node", xpath);
+	  if (nodes.length != 1){
+	    //getLog('misc').error("xpath doesn't return strictly one node", xpath);
+	    }
 
 	  if (nodes.length >= 1)
 	    return nodes[0];
@@ -237,6 +238,22 @@ var xPathToNode;
 
 })()
 
+//iMacros
+var retrieveTargetForIMacros = function(targetInfo){
+    var ls = document.querySelectorAll(targetInfo.nodeName);
+    var textMatchCount = 0;
+    for (var i = 0; i<ls.length; i++){
+        var node = ls[i];
+        if (node.textContent == targetInfo.textContent){
+           textMatchCount ++;
+           if (textMatchCount == targetInfo.pos){
+              return node;
+           }
+        }
+    }
+    return;
+}
+
 function simulateClick(node) {
     var evt = document.createEvent("MouseEvents");
     evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0,
@@ -256,6 +273,7 @@ var func_a1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 var func_b1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTarget(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
 	simulateClick(target);
 };
 
@@ -305,6 +323,20 @@ var func_e1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 };
 
 var func_e2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+//the iMacros algorithm
+
+var func_f1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+	var targetInfo = JSON.parse(iMacrosTargetInfoString);
+    var node = retrieveTargetForIMacros(targetInfo);
+	if (node == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(node);
+};
+
+var func_f2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var url3 = window.location.href;
 	return url3;
 };

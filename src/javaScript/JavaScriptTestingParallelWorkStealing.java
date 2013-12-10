@@ -28,7 +28,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	TaskQueue queue;
 	String javaScriptFunctions;
 	int algorithms;
-	List<Integer> subalgorithms = new ArrayList<Integer>();
+	List<Integer> subalgorithms;
 	CSVWriter writer;
 	Boolean jquery;
 	
@@ -36,6 +36,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
+		this.algorithms = 0;
+		this.subalgorithms = new ArrayList<Integer>();
+		
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -64,10 +67,16 @@ public class JavaScriptTestingParallelWorkStealing {
 				//while loop for number of subalgorithms for each algorithm
 				while(true){
 					int count = this.subalgorithms.get(this.algorithms-1);
+					//System.out.println("func_"+letter+(count+1));
+					//System.out.println(this.subalgorithms);
 					if(this.javaScriptFunctions.contains("func_"+letter+(count+1))){
+						//System.out.println("present");
+						//System.out.println(this.subalgorithms);
 						this.subalgorithms.set(this.algorithms-1, count+1);
 					}
 					else{
+						//System.out.println("not present");
+						//System.out.println(this.subalgorithms);
 						break;
 					}
 				}
@@ -283,15 +292,15 @@ public class JavaScriptTestingParallelWorkStealing {
 		String output4 = "resources/output4.csv";
 		
 		Boolean jquery = false;
-		int threads = 4;
+		int threads = 8;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();
-		//system.stage(input1,javaScript1,output1,jquery,threads);
-		//system.stage(input2,javaScript2,output2,jquery,threads);
-		//system.stage(input3,javaScript3,output3,jquery,threads);
-		//system.stage(input4,javaScript4,output4,jquery,threads);
-		system.stage("resources/top700Input.csv","resources/filterAdult.js","resources/top700FilteredInput.csv",true,8);
+		system.stage(input1,javaScript1,output1,jquery,threads);
+		system.stage(input2,javaScript2,output2,jquery,threads);
+		system.stage(input3,javaScript3,output3,jquery,threads);
+		system.stage(input4,javaScript4,output4,jquery,threads);
+		//system.stage("resources/top700Input.csv","resources/filterAdult.js","resources/top700FilteredInput.csv",true,8);
 		system.endSession();
 	}
 

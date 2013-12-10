@@ -228,6 +228,27 @@ var saveTargetInfo;
 
 })()
 
+//iMacros
+
+var saveTargetInfoForIMacros = function(target){
+    var targetInfo = {};
+    targetInfo.nodeName = target.nodeName;
+    targetInfo.textContent = target.textContent;
+    var ls = document.querySelectorAll(targetInfo.nodeName);
+    var textMatchCount = 0;
+    for (var i = 0; i<ls.length; i++){
+        var node = ls[i];
+        if (node.textContent == targetInfo.textContent){
+           textMatchCount ++;
+           if (node == target){
+              targetInfo.pos = textMatchCount;
+              break;
+           }
+        }
+    }
+    return JSON.stringify(targetInfo);
+};
+
 /******* XPATH TO NODE code *********/
 
     // convert an xpath expression to an array of DOM nodes
@@ -265,5 +286,5 @@ var func_a1 = function(urlArg,xpath,url1,url2){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
 
-	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node);
+	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node)+"<,>"+saveTargetInfoForIMacros(node);
 };
