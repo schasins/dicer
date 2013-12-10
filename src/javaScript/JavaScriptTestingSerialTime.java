@@ -56,10 +56,9 @@ public class JavaScriptTestingSerialTime {
 		//Execution
 		long t0 = System.currentTimeMillis();
 		WebDriver driver = new FirefoxDriver();
-		driver.manage().timeouts()
-			.implicitlyWait(10, TimeUnit.SECONDS)
-			.pageLoadTimeout(10, TimeUnit.SECONDS)
-			.setScriptTimeout(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 		long t1 = System.currentTimeMillis();
 
 
@@ -98,6 +97,9 @@ public class JavaScriptTestingSerialTime {
 					writer.println(url + ";" + e.toString().split("\n")[0]);
 					driver.quit();
 					driver = new FirefoxDriver();
+					driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+					driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+					driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 				}
 			}
 		}
