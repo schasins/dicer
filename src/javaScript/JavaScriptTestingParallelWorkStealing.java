@@ -277,19 +277,24 @@ public class JavaScriptTestingParallelWorkStealing {
 	public static void main(String[] args) {
 		String input1 = "resources/input1-small.csv";
 		String javaScript1 = "resources/getXpaths.js";
-		String output1 = "resources/output1.csv";
+		String output1 = "resources/xpaths.csv";
 
 		String input2 = "resources/output1.csv";
 		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/output2.csv";
+		String output2 = "resources/fiteredXpaths.csv";
 
 		String input3 = "resources/output2.csv";
 		String javaScript3 = "resources/nodeSaving.js";
-		String output3 = "resources/output3.csv";
+		String output3 = "resources/savedNodes.csv";
 		
 		String input4 = "resources/output3.csv";
 		String javaScript4 = "resources/nodeRetrieving.js";
-		String output4 = "resources/output4.csv";
+		String output4 = "resources/nodeRetrieval1-SameSession.csv";
+
+		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose.csv";
+		
+		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar.csv";
+		
 		
 		Boolean jquery = false;
 		int threads = 8;
@@ -300,7 +305,10 @@ public class JavaScriptTestingParallelWorkStealing {
 		system.stage(input2,javaScript2,output2,jquery,threads);
 		system.stage(input3,javaScript3,output3,jquery,threads);
 		system.stage(input4,javaScript4,output4,jquery,threads);
-		//system.stage("resources/top700Input.csv","resources/filterAdult.js","resources/top700FilteredInput.csv",true,8);
+		system.endSession();
+        
+		system.startSession();
+		system.stage(input4,javaScript4,output5,jquery,threads);
 		system.endSession();
 	}
 
