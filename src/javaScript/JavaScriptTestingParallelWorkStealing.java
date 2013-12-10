@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
@@ -180,6 +182,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 	    public void run() {
 			WebDriver driver = new FirefoxDriver();
+			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
@@ -198,49 +203,60 @@ public class JavaScriptTestingParallelWorkStealing {
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
 
 			        List<String> ansList = new ArrayList<String>();
-					
-			        for (int j = 0; j<this.algorithms; j++){
-				        //reload for each algorithm
-			        	driver.get(url);
-
-						char letter = ((char) ((int) 'a' + j));
-				        int algorithmSubalgorithms = this.subalgorithms.get(j);
-				        for(int i = 0; i<algorithmSubalgorithms; i++){
-					        //load jquery if we need it and if we're on a new page
-					        if (this.jquery){
-						        String jqueryCode;
-						        try{
-									jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
-								}
-								catch(Exception e){System.out.println("Failed to open jquery file."); return;}
-						        ((JavascriptExecutor) driver).executeScript(jqueryCode);
-					        }
-					        
-					        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
-					        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
-							
-							
-							if(i == (algorithmSubalgorithms-1)){
-								if (ans != null){
-									ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
-									for(int k = 0; k<ansRows.size(); k++){
-										String ansRow = ansRows.get(k);
-										if (ansList.size()>k){
-											ansList.set(k, ansList.get(k)+"<,>"+ansRow);
+			        
+			        try{
+				        for (int j = 0; j<this.algorithms; j++){
+					        //reload for each algorithm
+				        	driver.get(url);
+	
+							char letter = ((char) ((int) 'a' + j));
+					        int algorithmSubalgorithms = this.subalgorithms.get(j);
+					        for(int i = 0; i<algorithmSubalgorithms; i++){
+						        //load jquery if we need it and if we're on a new page
+						        if (this.jquery){
+							        String jqueryCode;
+							        try{
+										jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+									}
+									catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+							        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+						        }
+						        
+						        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
+						        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
+								
+								
+								if(i == (algorithmSubalgorithms-1)){
+									if (ans != null){
+										ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
+										for(int k = 0; k<ansRows.size(); k++){
+											String ansRow = ansRows.get(k);
+											if (ansList.size()>k){
+												ansList.set(k, ansList.get(k)+"<,>"+ansRow);
+											}
+											else{
+												ansList.add(ansRow);
+											}
+											//if(this.verbose){System.out.println(ansRow);}
 										}
-										else{
-											ansList.add(ansRow);
-										}
-										//if(this.verbose){System.out.println(ansRow);}
 									}
 								}
-							}
+					        }
+				        }
+				        //put anslist in the writer
+				        for(int i = 0; i<ansList.size(); i++){
+				        	this.writer.writeNext(ansList.get(i).split("<,>"));
 				        }
 			        }
-			        //put anslist in the writer
-			        for(int i = 0; i<ansList.size(); i++){
-			        	this.writer.writeNext(ansList.get(i).split("<,>"));
-			        }
+					catch(WebDriverException e){
+						System.out.println(url + ": " + e.toString());
+						this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+						driver.quit();
+						driver = new FirefoxDriver();
+						driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+						driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+						driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+					}
 				}
 			}
 			
@@ -274,7 +290,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		//system.stage(input1,javaScript1,output1,jquery,threads);
 		//system.stage(input2,javaScript2,output2,jquery,threads);
 		//system.stage(input3,javaScript3,output3,jquery,threads);
-		system.stage(input4,javaScript4,output4,jquery,threads);
+		//system.stage(input4,javaScript4,output4,jquery,threads);
+		system.stage("resources/top700Input.csv","resources/filterAdult.js","resources/top700FilteredInput.csv",true,8);
 		system.endSession();
 	}
 
