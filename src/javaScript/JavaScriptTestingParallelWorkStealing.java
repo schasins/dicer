@@ -17,9 +17,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Joiner;
 
@@ -34,9 +31,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	List<Integer> subalgorithms;
 	CSVWriter writer;
 	Boolean jquery;
-	Process proxyserver;
-	String cachedir;
 	int stages;
+	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
 	
 	JavaScriptTestingParallelWorkStealing(){
 		stages = 0;
@@ -135,20 +132,41 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		System.out.println("Starting session.");
-		Date date = new Date();
-		String path_to_proxy_server = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/cache/proxyserv.py";
+		/*Date date = new Date();
+		String path_to_proxy_server = "/home/mangpo/work/262a/httpmessage/cache/proxyserv.py";
 		cachedir = "cache_" + date.toString().replace(" ", "_");
 		try {
 			proxyserver = Runtime.getRuntime().exec("python " + path_to_proxy_server + " " + cachedir);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}*/
+		try {
+			System.out.println("mkdir " + path_to_proxyserver + ".cache");
+			Process p = Runtime.getRuntime().exec("rm -r " + path_to_proxyserver + ".cache");
+			p.waitFor();
+			p = Runtime.getRuntime().exec("mkdir " + path_to_proxyserver + ".cache");
+			p.waitFor();
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 	
 	public void endSession(){
 		System.out.println("Ending session.");
-		proxyserver.destroy();
+		//proxyserver.destroy();
+		Date date = new Date();
+		String cache_dir = "cache_" + date.toString().replace(" ", "_");
+		try {
+			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+			p.waitFor();
+			System.out.print("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private class TaskQueue {
@@ -301,7 +319,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input-filtered-100.csv";
+		//String input1 = "resources/input-filtered-100.csv";
+		String input1 = "resources/input3.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
@@ -323,7 +342,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		
 		Boolean jquery = false;
-		int threads = 8;
+		int threads = 4;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();
