@@ -280,7 +280,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						System.out.println(url + ": " + e.toString());
 						this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver.quit();
-						driver = new FirefoxDriver();
+						driver = new FirefoxDriver(cap);
 						driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 						driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 						driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
@@ -294,7 +294,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		String input1 = "resources/inputUrls.csv";
+		String input1 = "resources/input2.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
