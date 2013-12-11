@@ -17,9 +17,6 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Joiner;
 
@@ -35,6 +32,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
 	
 	JavaScriptTestingParallelWorkStealing(){
 	}
@@ -141,7 +139,8 @@ public class JavaScriptTestingParallelWorkStealing {
 			System.out.println("mkdir " + path_to_proxyserver + ".cache");
 			Process p = Runtime.getRuntime().exec("rm -r " + path_to_proxyserver + ".cache");
 			p.waitFor();
-			Runtime.getRuntime().exec("mkdir " + path_to_proxyserver + ".cache");
+			p = Runtime.getRuntime().exec("mkdir " + path_to_proxyserver + ".cache");
+			p.waitFor();
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,8 +153,10 @@ public class JavaScriptTestingParallelWorkStealing {
 		Date date = new Date();
 		String cache_dir = "cache_" + date.toString().replace(" ", "_");
 		try {
-			Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
-		} catch (IOException e) {
+			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+			p.waitFor();
+			System.out.print("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -317,7 +318,7 @@ public class JavaScriptTestingParallelWorkStealing {
 
 		String input2 = "resources/xpaths.csv";
 		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/fiteredXpaths.csv";
+		String output2 = "resources/filteredXpaths.csv";
 
 		String input3 = "resources/filteredXpaths.csv";
 		String javaScript3 = "resources/nodeSaving.js";
