@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -30,7 +31,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	TaskQueue queue;
 	String javaScriptFunctions;
 	int algorithms;
-	List<Integer> subalgorithms = new ArrayList<Integer>();
+	List<Integer> subalgorithms;
 	CSVWriter writer;
 	Boolean jquery;
 	Process proxyserver;
@@ -40,6 +41,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
+		this.algorithms = 0;
+		this.subalgorithms = new ArrayList<Integer>();
+		
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
@@ -68,10 +72,16 @@ public class JavaScriptTestingParallelWorkStealing {
 				//while loop for number of subalgorithms for each algorithm
 				while(true){
 					int count = this.subalgorithms.get(this.algorithms-1);
+					//System.out.println("func_"+letter+(count+1));
+					//System.out.println(this.subalgorithms);
 					if(this.javaScriptFunctions.contains("func_"+letter+(count+1))){
+						//System.out.println("present");
+						//System.out.println(this.subalgorithms);
 						this.subalgorithms.set(this.algorithms-1, count+1);
 					}
 					else{
+						//System.out.println("not present");
+						//System.out.println(this.subalgorithms);
 						break;
 					}
 				}
@@ -200,9 +210,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			cap.setCapability(CapabilityType.PROXY, proxy);
 			
 			WebDriver driver = new FirefoxDriver(cap);
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
@@ -221,49 +231,60 @@ public class JavaScriptTestingParallelWorkStealing {
 					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
 
 			        List<String> ansList = new ArrayList<String>();
-					
-			        for (int j = 0; j<this.algorithms; j++){
-				        //reload for each algorithm
-			        	driver.get(url);
-
-						char letter = ((char) ((int) 'a' + j));
-				        int algorithmSubalgorithms = this.subalgorithms.get(j);
-				        for(int i = 0; i<algorithmSubalgorithms; i++){
-					        //load jquery if we need it and if we're on a new page
-					        if (this.jquery){
-						        String jqueryCode;
-						        try{
-									jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
-								}
-								catch(Exception e){System.out.println("Failed to open jquery file."); return;}
-						        ((JavascriptExecutor) driver).executeScript(jqueryCode);
-					        }
-					        
-					        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
-					        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
-							
-							
-							if(i == (algorithmSubalgorithms-1)){
-								if (ans != null){
-									ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
-									for(int k = 0; k<ansRows.size(); k++){
-										String ansRow = ansRows.get(k);
-										if (ansList.size()>k){
-											ansList.set(k, ansList.get(k)+"<,>"+ansRow);
+			        
+			        try{
+				        for (int j = 0; j<this.algorithms; j++){
+					        //reload for each algorithm
+				        	driver.get(url);
+	
+							char letter = ((char) ((int) 'a' + j));
+					        int algorithmSubalgorithms = this.subalgorithms.get(j);
+					        for(int i = 0; i<algorithmSubalgorithms; i++){
+						        //load jquery if we need it and if we're on a new page
+						        if (this.jquery){
+							        String jqueryCode;
+							        try{
+										jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+									}
+									catch(Exception e){System.out.println("Failed to open jquery file."); return;}
+							        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+						        }
+						        
+						        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
+						        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
+								
+								
+								if(i == (algorithmSubalgorithms-1)){
+									if (ans != null){
+										ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
+										for(int k = 0; k<ansRows.size(); k++){
+											String ansRow = ansRows.get(k);
+											if (ansList.size()>k){
+												ansList.set(k, ansList.get(k)+"<,>"+ansRow);
+											}
+											else{
+												ansList.add(ansRow);
+											}
+											//if(this.verbose){System.out.println(ansRow);}
 										}
-										else{
-											ansList.add(ansRow);
-										}
-										//if(this.verbose){System.out.println(ansRow);}
 									}
 								}
-							}
+					        }
+				        }
+				        //put anslist in the writer
+				        for(int i = 0; i<ansList.size(); i++){
+				        	this.writer.writeNext(ansList.get(i).split("<,>"));
 				        }
 			        }
-			        //put anslist in the writer
-			        for(int i = 0; i<ansList.size(); i++){
-			        	this.writer.writeNext(ansList.get(i).split("<,>"));
-			        }
+					catch(WebDriverException e){
+						System.out.println(url + ": " + e.toString());
+						this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+						driver.quit();
+						driver = new FirefoxDriver();
+						driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+						driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+						driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+					}
 				}
 			}
 			
@@ -275,29 +296,38 @@ public class JavaScriptTestingParallelWorkStealing {
 	public static void main(String[] args) {
 		String input1 = "resources/input1-small.csv";
 		String javaScript1 = "resources/getXpaths.js";
-		String output1 = "resources/output1.csv";
+		String output1 = "resources/xpaths.csv";
 
 		String input2 = "resources/output1.csv";
 		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/output2.csv";
+		String output2 = "resources/fiteredXpaths.csv";
 
 		String input3 = "resources/output2.csv";
 		String javaScript3 = "resources/nodeSaving.js";
-		String output3 = "resources/output3.csv";
+		String output3 = "resources/savedNodes.csv";
 		
 		String input4 = "resources/output3.csv";
 		String javaScript4 = "resources/nodeRetrieving.js";
-		String output4 = "resources/output4.csv";
+		String output4 = "resources/nodeRetrieval1-SameSession.csv";
+
+		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose.csv";
+		
+		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar.csv";
+		
 		
 		Boolean jquery = false;
-		int threads = 4;
+		int threads = 8;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();
-		//system.stage(input1,javaScript1,output1,jquery,threads);
-		//system.stage(input2,javaScript2,output2,jquery,threads);
-		//system.stage(input3,javaScript3,output3,jquery,threads);
+		system.stage(input1,javaScript1,output1,jquery,threads);
+		system.stage(input2,javaScript2,output2,jquery,threads);
+		system.stage(input3,javaScript3,output3,jquery,threads);
 		system.stage(input4,javaScript4,output4,jquery,threads);
+		system.endSession();
+        
+		system.startSession();
+		system.stage(input4,javaScript4,output5,jquery,threads);
 		system.endSession();
 	}
 
