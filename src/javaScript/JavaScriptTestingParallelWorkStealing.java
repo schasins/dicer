@@ -34,8 +34,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	List<Integer> subalgorithms;
 	CSVWriter writer;
 	Boolean jquery;
-	Process proxyserver;
-	String cachedir;
+	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	
 	JavaScriptTestingParallelWorkStealing(){
 	}
@@ -129,7 +128,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void startSession(){
-		Date date = new Date();
+		/*Date date = new Date();
 		String path_to_proxy_server = "/home/mangpo/work/262a/httpmessage/cache/proxyserv.py";
 		cachedir = "cache_" + date.toString().replace(" ", "_");
 		try {
@@ -137,11 +136,29 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}*/
+		try {
+			System.out.println("mkdir " + path_to_proxyserver + ".cache");
+			Process p = Runtime.getRuntime().exec("rm -r " + path_to_proxyserver + ".cache");
+			p.waitFor();
+			Runtime.getRuntime().exec("mkdir " + path_to_proxyserver + ".cache");
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 	
 	public void endSession(){
-		proxyserver.destroy();
+		//proxyserver.destroy();
+		Date date = new Date();
+		String cache_dir = "cache_" + date.toString().replace(" ", "_");
+		try {
+			Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private class TaskQueue {
@@ -294,7 +311,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input2.csv";
+		String input1 = "resources/input3.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
@@ -316,7 +333,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		
 		Boolean jquery = false;
-		int threads = 8;
+		int threads = 4;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();
