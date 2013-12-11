@@ -2,7 +2,6 @@ package javaScript;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import com.google.common.base.Joiner;
 
 import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 
 public class JavaScriptTestingParallelWorkStealingTime {
 	List<String[]> rows;
@@ -120,13 +118,13 @@ public class JavaScriptTestingParallelWorkStealingTime {
 		
 	    public void run() {
 			long t0 = System.currentTimeMillis();
-			String PROXY = "localhost:8000";
+			String PROXY = "localhost:1234";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
 			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
 			DesiredCapabilities cap = new DesiredCapabilities();
 			cap.setCapability(CapabilityType.PROXY, proxy);
 			
-			WebDriver driver = new FirefoxDriver();
+			WebDriver driver = new FirefoxDriver(cap);
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
@@ -165,7 +163,7 @@ public class JavaScriptTestingParallelWorkStealingTime {
 						System.out.println(url + ": " + e.toString());
 						writer.println(url + ";" + e.toString().split("\n")[0]);
 						driver.quit();
-						driver = new FirefoxDriver();
+						driver = new FirefoxDriver(cap);
 						driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 						driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 						driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
@@ -184,7 +182,7 @@ public class JavaScriptTestingParallelWorkStealingTime {
 		String outputFile = "resources/output.csv";
 		
 		JavaScriptTestingParallelWorkStealingTime runner = new JavaScriptTestingParallelWorkStealingTime(inputFile,javaScriptFile,outputFile);
-		runner.execute(8);
+		runner.execute(4);
 	}
 
 }

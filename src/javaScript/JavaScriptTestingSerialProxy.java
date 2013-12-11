@@ -55,7 +55,7 @@ public class JavaScriptTestingSerialProxy {
 		}
 		
 		//Execution
-		String PROXY = "localhost:8000";
+		String PROXY = "localhost:1234";
 		org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
 		proxy.setHttpProxy(PROXY).setNoProxy("https:*");
 		DesiredCapabilities cap = new DesiredCapabilities();
@@ -103,6 +103,9 @@ public class JavaScriptTestingSerialProxy {
 					writer.println(url + ";" + e.toString().split("\n")[0]);
 					driver.quit();
 					driver = new FirefoxDriver(cap);
+					driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+					driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+					driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 				}
 			}
 		}

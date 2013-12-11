@@ -6,12 +6,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -29,6 +33,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	List<Integer> subalgorithms = new ArrayList<Integer>();
 	CSVWriter writer;
 	Boolean jquery;
+	Process proxyserver;
+	String cachedir;
 	
 	JavaScriptTestingParallelWorkStealing(){
 	}
@@ -113,11 +119,19 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void startSession(){
-		
+		Date date = new Date();
+		String path_to_proxy_server = "/home/mangpo/work/262a/httpmessage/cache/proxyserv.py";
+		cachedir = "cache_" + date.toString().replace(" ", "_");
+		try {
+			proxyserver = Runtime.getRuntime().exec("python " + path_to_proxy_server + " " + cachedir);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void endSession(){
-		
+		proxyserver.destroy();
 	}
 	
 	private class TaskQueue {
@@ -179,7 +193,16 @@ public class JavaScriptTestingParallelWorkStealing {
 		 */
 		
 	    public void run() {
-			WebDriver driver = new FirefoxDriver();
+			String PROXY = "localhost:1234";
+			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
+			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
+			DesiredCapabilities cap = new DesiredCapabilities();
+			cap.setCapability(CapabilityType.PROXY, proxy);
+			
+			WebDriver driver = new FirefoxDriver(cap);
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
