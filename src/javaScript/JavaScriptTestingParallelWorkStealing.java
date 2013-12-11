@@ -227,6 +227,21 @@ public class JavaScriptTestingParallelWorkStealing {
 		 } 
 		 */
 		
+		public WebDriver newDriver(DesiredCapabilities cap){
+			try{
+			WebDriver driver = new FirefoxDriver(cap);
+			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+			return driver;
+			}
+			catch (WebDriverException exc){
+				System.out.println(exc.toString().split("\n")[0]);
+				return newDriver(cap);
+			}
+			
+		}
+		
 	    public void run() {
 			String PROXY = "localhost:1234";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
@@ -234,10 +249,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			DesiredCapabilities cap = new DesiredCapabilities();
 			cap.setCapability(CapabilityType.PROXY, proxy);
 			
-			WebDriver driver = new FirefoxDriver(cap);
-			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+			WebDriver driver = newDriver(cap);
+			
+			int count = 0;
 
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
@@ -261,6 +275,8 @@ public class JavaScriptTestingParallelWorkStealing {
 				        for (int j = 0; j<this.algorithms; j++){
 					        //reload for each algorithm
 				        	driver.get(url);
+				        	count++;
+				        	System.out.println("Retrieved: "+url+" - "+count);
 	
 							char letter = ((char) ((int) 'a' + j));
 					        int algorithmSubalgorithms = this.subalgorithms.get(j);
@@ -305,10 +321,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						System.out.println(url + ": " + e.toString().split("\n")[0]);
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver.quit();
-						driver = new FirefoxDriver(cap);
-						driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-						driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-						driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+						driver = newDriver(cap);
 					}
 				}
 			}
@@ -320,7 +333,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public static void main(String[] args) {
 		//String input1 = "resources/input-filtered-100.csv";
-		String input1 = "resources/input3.csv";
+		String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
@@ -342,7 +355,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		
 		Boolean jquery = false;
-		int threads = 4;
+		int threads = 8;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		system.startSession();
