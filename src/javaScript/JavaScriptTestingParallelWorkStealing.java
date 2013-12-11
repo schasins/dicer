@@ -130,7 +130,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		Date date = new Date();
-		String path_to_proxy_server = "/home/mangpo/work/262a/httpmessage/cache/proxyserv.py";
+		String path_to_proxy_server = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/cache/proxyserv.py";
 		cachedir = "cache_" + date.toString().replace(" ", "_");
 		try {
 			proxyserver = Runtime.getRuntime().exec("python " + path_to_proxy_server + " " + cachedir);
@@ -294,13 +294,13 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input2.csv";
+		String input1 = "resources/input1-small.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
 		String input2 = "resources/xpaths.csv";
 		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/fiteredXpaths.csv";
+		String output2 = "resources/filteredXpaths.csv";
 
 		String input3 = "resources/filteredXpaths.csv";
 		String javaScript3 = "resources/nodeSaving.js";
