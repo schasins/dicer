@@ -294,19 +294,19 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input1-small.csv";
+		String input1 = "resources/inputUrls.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
-		String input2 = "resources/output1.csv";
+		String input2 = "resources/xpaths.csv";
 		String javaScript2 = "resources/filter.js";
 		String output2 = "resources/fiteredXpaths.csv";
 
-		String input3 = "resources/output2.csv";
+		String input3 = "resources/filteredXpaths.csv";
 		String javaScript3 = "resources/nodeSaving.js";
 		String output3 = "resources/savedNodes.csv";
 		
-		String input4 = "resources/output3.csv";
+		String input4 = "resources/savedNodes.csv";
 		String javaScript4 = "resources/nodeRetrieving.js";
 		String output4 = "resources/nodeRetrieval1-SameSession.csv";
 
