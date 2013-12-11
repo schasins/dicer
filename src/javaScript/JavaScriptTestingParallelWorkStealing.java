@@ -36,11 +36,16 @@ public class JavaScriptTestingParallelWorkStealing {
 	Boolean jquery;
 	Process proxyserver;
 	String cachedir;
+	int stages;
 	
 	JavaScriptTestingParallelWorkStealing(){
+		stages = 0;
 	}
 	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
+		this.stages ++;
+		System.out.println("STAGE "+this.stages);
+		
 		this.algorithms = 0;
 		this.subalgorithms = new ArrayList<Integer>();
 		
@@ -129,6 +134,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void startSession(){
+		System.out.println("Starting session.");
 		Date date = new Date();
 		String path_to_proxy_server = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/cache/proxyserv.py";
 		cachedir = "cache_" + date.toString().replace(" ", "_");
@@ -141,6 +147,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void endSession(){
+		System.out.println("Ending session.");
 		proxyserver.destroy();
 	}
 	
@@ -277,8 +284,8 @@ public class JavaScriptTestingParallelWorkStealing {
 				        }
 			        }
 					catch(WebDriverException e){
-						System.out.println(url + ": " + e.toString());
-						this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+						System.out.println(url + ": " + e.toString().split("\n")[0]);
+						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver.quit();
 						driver = new FirefoxDriver(cap);
 						driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -294,7 +301,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input1-small.csv";
+		String input1 = "resources/input-filtered-100.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 

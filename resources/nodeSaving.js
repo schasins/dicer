@@ -272,6 +272,9 @@ var saveTargetInfoForIMacros = function(target){
 
 	function xPathToNode(xpath) {
 	  var nodes = xPathToNodes(xpath);
+	  if (nodes == null){
+	     return null;
+	  }
 	  //if we don't successfully find nodes, let's alert
 	  if (nodes.length != 1)
 	    return null;
