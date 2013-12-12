@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -19,6 +20,8 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.base.Joiner;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -229,7 +232,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			WebDriver driver = new FirefoxDriver(cap);
+			//WebDriver driver = new FirefoxDriver(cap);
+			WebDriver driver = new FirefoxDriver();
 			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
@@ -242,6 +246,87 @@ public class JavaScriptTestingParallelWorkStealing {
 			
 		}
 		
+		public WebDriver processRow(WebDriver driver, String[] row, DesiredCapabilities cap){
+			String url = row[0];
+			if (!url.startsWith("http")){url = "http://"+url;}
+
+	        //make the argString, since that will be the same across algorithms and subalgorithms
+	        for(int j = 0; j < row.length; j++){
+	            row[j] = "'"+row[j]+"'";
+	        }
+			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
+
+	        List<String> ansList = new ArrayList<String>();
+	        
+	        try{
+		        for (int j = 0; j<this.algorithms; j++){
+			        //reload for each algorithm
+		        	driver.get(url);
+
+					char letter = ((char) ((int) 'a' + j));
+			        int algorithmSubalgorithms = this.subalgorithms.get(j);
+			        for(int i = 0; i<algorithmSubalgorithms; i++){
+				        //load jquery if we need it and if we're on a new page
+				        if (this.jquery){
+					        String jqueryCode;
+					        try{
+								jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
+							}
+							catch(Exception e){System.out.println("Failed to open jquery file."); return driver;}
+					        ((JavascriptExecutor) driver).executeScript(jqueryCode);
+				        }
+				        
+				        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
+				        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
+						
+						
+						if(i == (algorithmSubalgorithms-1)){
+							if (ans != null){
+								ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
+								for(int k = 0; k<ansRows.size(); k++){
+									String ansRow = ansRows.get(k);
+									if (ansList.size()>k){
+										ansList.set(k, ansList.get(k)+"<,>"+ansRow);
+									}
+									else{
+										ansList.add(ansRow);
+									}
+									//if(this.verbose){System.out.println(ansRow);}
+								}
+							}
+						}
+			        }
+		        }
+		        //put anslist in the writer
+		        for(int i = 0; i<ansList.size(); i++){
+		        	this.writer.writeNext(ansList.get(i).split("<,>"));
+		        }
+	        }
+			catch(WebDriverException e){
+				System.out.println(url + ": " + e.toString().split("\n")[0]);
+				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+				driver.quit();
+				driver = newDriver(cap);
+			}
+	        return driver;
+		}
+		
+		public class ProcessRow implements Callable<WebDriver>{
+		    private final WebDriver driver;
+		    private final String[] row;
+		    private final DesiredCapabilities cap;
+
+		    public ProcessRow(WebDriver driver, String[] row, DesiredCapabilities cap) {
+		        this.driver = driver;
+		        this.row = row;
+		        this.cap = cap;
+		    }
+
+		    public WebDriver call() throws Exception {
+		    	return processRow(driver,row,cap);
+		    }
+		}
+		
 	    public void run() {
 			String PROXY = "localhost:1234";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
@@ -250,8 +335,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			cap.setCapability(CapabilityType.PROXY, proxy);
 			
 			WebDriver driver = newDriver(cap);
-			
-			int count = 0;
 
 			if (driver instanceof JavascriptExecutor) {
 				while (true) {
@@ -260,65 +343,13 @@ public class JavaScriptTestingParallelWorkStealing {
 					if (row == null){
 						break; //the queue is empty
 					}
-					String url = row[0];
-					if (!url.startsWith("http")){url = "http://"+url;}
-
-			        //make the argString, since that will be the same across algorithms and subalgorithms
-			        for(int j = 0; j < row.length; j++){
-			            row[j] = "'"+row[j]+"'";
-			        }
-					String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
-
-			        List<String> ansList = new ArrayList<String>();
-			        
-			        try{
-				        for (int j = 0; j<this.algorithms; j++){
-					        //reload for each algorithm
-				        	driver.get(url);
-				        	count++;
-				        	System.out.println("Retrieved: "+url+" - "+count);
-	
-							char letter = ((char) ((int) 'a' + j));
-					        int algorithmSubalgorithms = this.subalgorithms.get(j);
-					        for(int i = 0; i<algorithmSubalgorithms; i++){
-						        //load jquery if we need it and if we're on a new page
-						        if (this.jquery){
-							        String jqueryCode;
-							        try{
-										jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
-									}
-									catch(Exception e){System.out.println("Failed to open jquery file."); return;}
-							        ((JavascriptExecutor) driver).executeScript(jqueryCode);
-						        }
-						        
-						        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
-						        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
-								
-								
-								if(i == (algorithmSubalgorithms-1)){
-									if (ans != null){
-										ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
-										for(int k = 0; k<ansRows.size(); k++){
-											String ansRow = ansRows.get(k);
-											if (ansList.size()>k){
-												ansList.set(k, ansList.get(k)+"<,>"+ansRow);
-											}
-											else{
-												ansList.add(ansRow);
-											}
-											//if(this.verbose){System.out.println(ansRow);}
-										}
-									}
-								}
-					        }
-				        }
-				        //put anslist in the writer
-				        for(int i = 0; i<ansList.size(); i++){
-				        	this.writer.writeNext(ansList.get(i).split("<,>"));
-				        }
-			        }
-					catch(WebDriverException e){
-						System.out.println(url + ": " + e.toString().split("\n")[0]);
+					
+				   TimeLimiter limiter = new SimpleTimeLimiter();
+				   
+				   try {
+					driver = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
+					} catch (Exception e) {
+						System.out.println(row[0] + ": " + e.toString().split("\n")[0]);
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver.quit();
 						driver = newDriver(cap);
