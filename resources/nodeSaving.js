@@ -222,7 +222,7 @@ var saveTargetInfo;
     var targetInfo = {};
     targetInfo.xpath = nodeToXPath(target);
     targetInfo.snapshot = snapshotNode(target);
-    targetInfo.branch = snapshotBranch(target);
+    //targetInfo.branch = snapshotBranch(target);
     return JSON.stringify(targetInfo);
   };
 
