@@ -246,7 +246,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			
 		}
 		
-		public WebDriver processRow(WebDriver driver, String[] row, DesiredCapabilities cap){
+		public Boolean processRow(WebDriver driver, String[] row, DesiredCapabilities cap){
 			String url = row[0];
 			if (!url.startsWith("http")){url = "http://"+url;}
 
@@ -272,7 +272,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					        try{
 								jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
 							}
-							catch(Exception e){System.out.println("Failed to open jquery file."); return driver;}
+							catch(Exception e){System.out.println("Failed to open jquery file."); return true;}
 					        ((JavascriptExecutor) driver).executeScript(jqueryCode);
 				        }
 				        
@@ -303,15 +303,18 @@ public class JavaScriptTestingParallelWorkStealing {
 		        }
 	        }
 			catch(WebDriverException e){
+				/*
 				System.out.println(url + ": " + e.toString().split("\n")[0]);
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 				driver.quit();
 				driver = newDriver(cap);
+				*/
+				return false;
 			}
-	        return driver;
+	        return true;
 		}
 		
-		public class ProcessRow implements Callable<WebDriver>{
+		public class ProcessRow implements Callable<Boolean>{
 		    private final WebDriver driver;
 		    private final String[] row;
 		    private final DesiredCapabilities cap;
@@ -322,7 +325,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		        this.cap = cap;
 		    }
 
-		    public WebDriver call() throws Exception {
+		    public Boolean call() throws Exception {
 		    	return processRow(driver,row,cap);
 		    }
 		}
@@ -347,8 +350,12 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					driver = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
-					} catch (Exception e) {
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
+					if (!driverOK){
+						driver.quit();
+						driver = newDriver(cap);
+					}
+				    } catch (Exception e) {
 						System.out.println(row[0] + ": " + e.toString().split("\n")[0]);
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver.quit();
