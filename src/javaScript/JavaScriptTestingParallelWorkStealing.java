@@ -232,8 +232,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			//WebDriver driver = new FirefoxDriver(cap);
-			WebDriver driver = new FirefoxDriver();
+			WebDriver driver = new FirefoxDriver(cap);
+			//WebDriver driver = new FirefoxDriver();
 			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
@@ -370,8 +370,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public static void main(String[] args) {
-		//String input1 = "resources/input-filtered-100.csv";
-		String input1 = "resources/input-baidu.csv";
+		String input1 = "resources/input-filtered-15.csv";
+		//String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
