@@ -393,7 +393,6 @@ public class JavaScriptTestingParallelWorkStealing {
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				System.exit(1);
 			}
 			return newDriver(cap);
 		}
