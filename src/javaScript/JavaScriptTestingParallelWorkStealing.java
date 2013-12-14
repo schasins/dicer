@@ -1,9 +1,12 @@
 package javaScript;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,6 +15,10 @@ import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -352,14 +359,12 @@ public class JavaScriptTestingParallelWorkStealing {
 				   try {
 					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
 					if (!driverOK){
-						driver.quit();
-						driver = newDriver(cap);
+						driver = replaceDriver(driver,cap);
 					}
 				    } catch (Exception e) {
 						System.out.println(row[0] + ": " + e.toString().split("\n")[0]);
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
-						driver.quit();
-						driver = newDriver(cap);
+						driver = replaceDriver(driver,cap);
 					}
 				}
 			}
@@ -367,10 +372,46 @@ public class JavaScriptTestingParallelWorkStealing {
 	        //Close the browser
 	        driver.quit();
 	    }
+	    
+		public WebDriver replaceDriver(WebDriver driver, DesiredCapabilities cap){
+			driver.quit();
+			//in case anything goes wrong, let's check for defunct processes
+			try {
+				String result = execToString("ps -e");
+				
+				String[] lines = result.split(System.getProperty("line.separator"));
+				String lastFirefox = "";
+				for (int i = 0; i<lines.length; i++){
+					String l = lines[i];
+					if (l.contains("firefox") && l.contains("defunct")){
+						System.out.println("Killing: "+lastFirefox);
+						execToString("kill "+lastFirefox);
+					}
+					else if (l.contains("firefox")){
+						lastFirefox = l.trim().split(" ")[0];
+					}
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				System.exit(1);
+			}
+			return newDriver(cap);
+		}
+		
+		public String execToString(String command) throws Exception {
+		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		    CommandLine commandline = CommandLine.parse(command);
+		    DefaultExecutor exec = new DefaultExecutor();
+		    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+		    exec.setStreamHandler(streamHandler);
+		    exec.execute(commandline);
+		    return(outputStream.toString());
+		}
 	}
+
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input-filtered-15.csv";
+		String input1 = "resources/input-filtered-50.csv";
 		//String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
