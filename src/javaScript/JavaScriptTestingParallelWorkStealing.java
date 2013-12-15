@@ -1,12 +1,11 @@
 package javaScript;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -42,11 +40,26 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
+	// JavaScript for DOM Modification
+	static String DOMModifierFunctions;
+	static int DOMChange;
+	
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
 	
-	JavaScriptTestingParallelWorkStealing(){
+	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
+	}
+	
+	JavaScriptTestingParallelWorkStealing(int DOMChange) {
+		this.DOMChange = DOMChange;
+		try {
+			this.DOMModifierFunctions = new Scanner(new File("src/javaScript/DOMModifier.js")).useDelimiter("\\Z").next();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Failed to open input src/javaScript/DOMModifier.js.");
+			System.exit(1);
+		}
 	}
 	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
@@ -142,15 +155,6 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		System.out.println("Starting session.");
-		/*Date date = new Date();
-		String path_to_proxy_server = "/home/mangpo/work/262a/httpmessage/cache/proxyserv.py";
-		cachedir = "cache_" + date.toString().replace(" ", "_");
-		try {
-			proxyserver = Runtime.getRuntime().exec("python " + path_to_proxy_server + " " + cachedir);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		try {
 			System.out.println("mkdir " + path_to_proxyserver + ".cache");
 			Process p = Runtime.getRuntime().exec("rm -r " + path_to_proxyserver + ".cache");
@@ -166,9 +170,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void endSession(){
 		System.out.println("Ending session.");
-		//proxyserver.destroy();
 		Date date = new Date();
-		String cache_dir = "cache_" + date.toString().replace(" ", "_");
+		String cache_dir = "arch_" + date.toString().replace(" ", "_");
 		try {
 			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
 			p.waitFor();
@@ -253,6 +256,44 @@ public class JavaScriptTestingParallelWorkStealing {
 			
 		}
 		
+		private void loadPage(WebDriver driver, String url) {
+			driver.get(url);
+			// TODO: modify DOM here.
+			Object ans;
+			switch(DOMChange) {
+			case 1:
+				/*System.out.println("MODIFY DOM 1");
+				ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[4]/SPAN[1]/CENTER[1]/DIV[1]/IMG[1]\").tagName;");
+				System.out.println(ans.toString());*/
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return centerFirstLevelDiv();");
+				/*ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/CENTER[1]/DIV[1]/DIV[4]/SPAN[1]/CENTER[1]/DIV[1]/IMG[1]\").tagName;");
+				System.out.println(ans.toString());*/
+				break;
+			case 2:
+				System.out.println("MODIFY DOM 2");
+				/*ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[1]\").id;");
+				System.out.println(ans.toString());*/
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return insertNodes();");
+				/*ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[2]/DIV[2]\").id;");
+				System.out.println(ans.toString());*/
+				break;
+			case 3:
+				/*System.out.println("MODIFY DOM 3");
+				ans = ((JavascriptExecutor) driver).executeScript(
+						" return document.body.getElementsByTagName(\"h2\").length;");
+				System.out.println(ans.toString());*/
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return h2Toh3();");
+				/*ans = ((JavascriptExecutor) driver).executeScript(
+						" return document.body.getElementsByTagName(\"h2\").length;");
+				System.out.println(ans.toString());*/
+				break;
+			}
+		}
+		
 		public Boolean processRow(WebDriver driver, String[] row, DesiredCapabilities cap){
 			String url = row[0];
 			if (!url.startsWith("http")){url = "http://"+url;}
@@ -268,7 +309,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        try{
 		        for (int j = 0; j<this.algorithms; j++){
 			        //reload for each algorithm
-		        	driver.get(url);
+		        	loadPage(driver,url);
 
 					char letter = ((char) ((int) 'a' + j));
 			        int algorithmSubalgorithms = this.subalgorithms.get(j);
