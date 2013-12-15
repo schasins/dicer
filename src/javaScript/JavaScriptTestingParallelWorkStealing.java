@@ -49,9 +49,11 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
+		this.DOMChange = 0;
 	}
 	
 	JavaScriptTestingParallelWorkStealing(int DOMChange) {
+		stages = 0;
 		this.DOMChange = DOMChange;
 		try {
 			this.DOMModifierFunctions = new Scanner(new File("src/javaScript/DOMModifier.js")).useDelimiter("\\Z").next();
