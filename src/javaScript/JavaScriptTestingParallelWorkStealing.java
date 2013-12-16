@@ -44,8 +44,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	static String DOMModifierFunctions;
 	static int DOMChange;
 	
-	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
-	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
+	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
 	
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
@@ -274,8 +274,8 @@ public class JavaScriptTestingParallelWorkStealing {
 				System.out.println(ans.toString());*/
 				break;
 			case 2:
-				System.out.println("MODIFY DOM 2");
-				/*ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+				/*System.out.println("MODIFY DOM 2");
+				ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
 						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[1]\").id;");
 				System.out.println(ans.toString());*/
 				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return insertNodes();");
@@ -292,6 +292,9 @@ public class JavaScriptTestingParallelWorkStealing {
 				/*ans = ((JavascriptExecutor) driver).executeScript(
 						" return document.body.getElementsByTagName(\"h2\").length;");
 				System.out.println(ans.toString());*/
+				break;
+			case 4:
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return moveAround();");
 				break;
 			}
 		}
