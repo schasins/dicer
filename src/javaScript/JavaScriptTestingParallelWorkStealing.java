@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -40,9 +41,13 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
+	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
 	static int DOMChange;
+	
+	// Number of done jobs
+	static int finishedJobs;
 	
 	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
@@ -186,9 +191,21 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	private class TaskQueue {
 		List<String[]> rows;
+		int count, timeout;
+		long start;
 		
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
+			this.count = 0;
+			this.timeout = 0;
+			start = System.currentTimeMillis();
+			try {
+				PrintWriter output = new PrintWriter(new FileWriter("time.csv"));
+				output.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		public synchronized String[] pop(){
@@ -198,6 +215,26 @@ public class JavaScriptTestingParallelWorkStealing {
 				return row;
 			}
 			return null;
+		}
+		
+
+		public synchronized void timeout() {
+			timeout++;
+		}
+		
+		public synchronized void done() {
+			count++;
+			if(count%100 == 0) {
+				try {
+					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
+					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
+					output.write("," + timeout + "\n");
+					output.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		public boolean empty(){
@@ -403,15 +440,18 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
-					if (!driverOK){
-						driver = replaceDriver(driver,cap);
-					}
-				    } catch (Exception e) {
-						System.out.println(row[0] + ": " + e.toString().split("\n")[0]);
-						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
-						driver = replaceDriver(driver,cap);
-					}
+					   boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
+					   if (!driverOK){
+						   driver = replaceDriver(driver,cap);
+					   }
+				   } catch (Exception e) {
+					   System.out.println(row[0] + ": " + e.toString().split("\n")[0]);
+					   //this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+					   driver = replaceDriver(driver,cap);
+					   this.queue.timeout();
+				   } finally {
+					   this.queue.done();
+				   }
 				}
 			}
 			
