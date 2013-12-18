@@ -38,22 +38,21 @@ var insertNodes = function () {
       }
     }
     if(insert) {
-      console.log("INSERT");
-      console.log(element.childNodes);
+      //console.log("INSERT");
+      //console.log(element.childNodes);
       element.insertBefore(insert,children[0]);
-      console.log(element.childNodes);
+      //console.log(element.childNodes);
       count++;
     }
   }
 };
 
-var h2Toh3 = function () {
-  var headings = document.body.getElementsByTagName("h2");
+var spanToP = function () {
+  var headings = document.body.getElementsByTagName("span");
   while(headings.length > 0) {
     var h2 = headings[0];
     var parent = h2.parentNode;
-    var h3 = document.createElement('h3');
-    //console.log(h2);
+    var h3 = document.createElement('p');
     h3.textContent = h2.textContent;
     h3.setAttribute("class",h2.className);
     h3.setAttribute("id",h2.id);
@@ -61,6 +60,7 @@ var h2Toh3 = function () {
       h3.appendChild(h2.childNodes[0]);
     }
     parent.replaceChild(h3, h2);
+    //console.log(h3);
   }
 };
 
@@ -88,7 +88,7 @@ var moveAround = function () {
 var changeTextInner = function(x) {
   if(x.childNodes.length == 0) {
     x.textContent = x.textContent + "x";
-    console.log(x);
+    //console.log(x);
   } else {
     for(var i = 0; i < x.childNodes.length; i++) {
       changeTextInner(x.childNodes[i]);

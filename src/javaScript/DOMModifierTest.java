@@ -3,7 +3,7 @@ package javaScript;
 public class DOMModifierTest {
 
 	public static void main(String[] args) {
-		String input1 = "resources/google.csv";
+		/*String input1 = "resources/google.csv";
 		String javaScript1 = "resources/titleExtractor.js";
 		String output1 = "resources/google-out.csv";
 		
@@ -17,7 +17,7 @@ public class DOMModifierTest {
 		system.endSession();
 		
 
-		/*String input2 = "resources/youtube.csv";
+		String input2 = "resources/youtube.csv";
 		String output2 = "resources/youtube-out.csv";
 		
 		JavaScriptTestingParallelWorkStealing system2 = new JavaScriptTestingParallelWorkStealing(3);
@@ -54,6 +54,18 @@ public class DOMModifierTest {
 		system3.startSession();
 		system3.stage(input1,javaScript1,output1+"3.csv",jquery,threads);
 		system3.endSession();*/
+		
+		String input1 = "resources/savedNodes-test.csv";
+		String javaScript1 = "resources/nodeRetrieving.js";
+		String output1 = "resources/nodeRetrieval0-test";
+		
+		Boolean jquery = false;
+		int threads = 1;
+		
+		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
+		//system.startSession();
+		system.stage(input1,javaScript1,output1,jquery,threads);
+		//system.endSession();
 	}
 
 }

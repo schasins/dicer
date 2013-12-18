@@ -285,6 +285,7 @@ var func_b2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 	return url3;
 };
 
+/*
 //the ID algorithm
 
 var func_c1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
@@ -316,30 +317,31 @@ var func_d2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 	var url3 = window.location.href;
 	return url3;
 };
+*/
 
 //the xpath algorithm
 
-var func_e1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+var func_c1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; } //won't click, so we'll get that the url is the same as the original
 	simulateClick(node);
 };
 
-var func_e2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+var func_c2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var url3 = window.location.href;
 	return url3;
 };
 
 //the iMacros algorithm
 
-var func_f1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+var func_d1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var targetInfo = JSON.parse(iMacrosTargetInfoString);
     var node = retrieveTargetForIMacros(targetInfo);
 	if (node == null) { return; } //won't click, so we'll get that the url is the same as the original
 	simulateClick(node);
 };
 
-var func_f2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
+var func_d2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString){
 	var url3 = window.location.href;
 	return url3;
 };

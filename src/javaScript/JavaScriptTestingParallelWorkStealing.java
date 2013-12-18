@@ -323,7 +323,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				ans = ((JavascriptExecutor) driver).executeScript(
 						" return document.body.getElementsByTagName(\"h2\").length;");
 				System.out.println(ans.toString());*/
-				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return h2Toh3();");
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return spanToP();");
 				/*ans = ((JavascriptExecutor) driver).executeScript(
 						" return document.body.getElementsByTagName(\"h2\").length;");
 				System.out.println(ans.toString());*/

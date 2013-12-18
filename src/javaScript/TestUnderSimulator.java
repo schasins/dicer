@@ -3,7 +3,7 @@ package javaScript;
 public class TestUnderSimulator {
 
 	public static void main(String[] args) {
-		String input1 = "resources/simulator.csv";
+		String input1 = "resources/ask.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
@@ -35,7 +35,7 @@ public class TestUnderSimulator {
 		// Session 0
 		start = System.currentTimeMillis();
 		system = new JavaScriptTestingParallelWorkStealing();
-		system.startSession();
+		//system.startSession();
 		system.stage(input1,javaScript1,output1,jquery,threads);
 		system.stage(input2,javaScript2,output2,jquery,threads);
 		system.stage(input3,javaScript3,output3,jquery,threads);
