@@ -142,10 +142,11 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void execute(int threads){
+		long start = System.currentTimeMillis();
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -155,6 +156,11 @@ public class JavaScriptTestingParallelWorkStealing {
 		for (Thread thread : threadList) {
 		    try {thread.join();} catch (InterruptedException e) {System.out.println("Could not join thread.");}
 		}
+
+		long stop = System.currentTimeMillis();
+		String[] times = new String[1];
+		times[0] = String.valueOf((stop-start)/1000);
+		this.writer.writeNext(times);
 		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
@@ -196,7 +202,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
-			this.count = 0;
+			// Comment out this line for scailability test
+			/*this.count = 0;
 			this.timeout = 0;
 			start = System.currentTimeMillis();
 			try {
@@ -205,7 +212,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 		
 		public synchronized String[] pop(){
@@ -217,11 +224,12 @@ public class JavaScriptTestingParallelWorkStealing {
 			return null;
 		}
 		
-
+		// Scalability test only
 		public synchronized void timeout() {
 			timeout++;
 		}
-		
+
+		// Scalability test only
 		public synchronized void done() {
 			count++;
 			if(count%100 == 0) {
@@ -250,14 +258,20 @@ public class JavaScriptTestingParallelWorkStealing {
 		CSVWriter writer;
 		Boolean jquery;
 		Boolean verbose = true;
+		int index;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery){
+		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
 			this.algorithms = algorithms;
 			this.subalgorithms = subalgorithms;
 			this.jquery = jquery;
+			this.index = i;
+		}
+		
+		public void print(String s){
+			System.out.println("["+this.index+"]"+s);
 		}
 		
 		/*
@@ -279,20 +293,49 @@ public class JavaScriptTestingParallelWorkStealing {
 		 } 
 		 */
 		
+		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			WebDriver driver = new FirefoxDriver(cap);
-			//WebDriver driver = new FirefoxDriver();
-			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+			//WebDriver driver = new FirefoxDriver(cap);
+			WebDriver driver = new FirefoxDriver();
+			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 			return driver;
 			}
 			catch (WebDriverException exc){
-				System.out.println(exc.toString().split("\n")[0]);
-				return newDriver(cap);
+				print("WebDriver excpetion trying to create new driver.");
+				print(exc.toString().split("\n")[0]);
+				return replaceDriver(null,cap);
 			}
 			
+		}
+		
+
+		//quits the original driver, checks for defunct processes, calls newDriver to actually create new driver
+		public WebDriver replaceDriver(WebDriver driver, DesiredCapabilities cap){
+			if (driver != null) {driver.quit();}
+			//in case anything goes wrong, let's check for defunct processes
+			try {
+				String result = execToString("ps -e");
+				
+				String[] lines = result.split(System.getProperty("line.separator"));
+				String lastFirefox = "";
+				for (int i = 0; i<lines.length; i++){
+					String l = lines[i];
+					if (l.contains("firefox") && l.contains("defunct")){
+						print("Killing: "+lastFirefox);
+						execToString("kill "+lastFirefox);
+					}
+					else if (l.contains("firefox")){
+						lastFirefox = l.trim().split(" ")[0];
+					}
+				}
+			} catch (Exception e1) {
+				print("Weren't able to close defunct processes.");
+				e1.printStackTrace();
+			}
+			return newDriver(cap);
 		}
 		
 		private void loadPage(WebDriver driver, String url) {
@@ -362,7 +405,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					        try{
 								jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
 							}
-							catch(Exception e){System.out.println("Failed to open jquery file."); return true;}
+							catch(Exception e){print("Failed to open jquery file."); return true;}
 					        ((JavascriptExecutor) driver).executeScript(jqueryCode);
 				        }
 				        
@@ -440,48 +483,33 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					   boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
-					   if (!driverOK){
-						   driver = replaceDriver(driver,cap);
-					   }
-				   } catch (Exception e) {
-					   System.out.println(row[0] + ": " + e.toString().split("\n")[0]);
-					   //this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
-					   driver = replaceDriver(driver,cap);
-					   this.queue.timeout();
-				   } finally {
-					   this.queue.done();
-				   }
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 10, TimeUnit.SECONDS, false);
+					if (!driverOK){
+						print("Replacing driver after !driverOK.");
+						driver = replaceDriver(driver,cap);
+						print(driver.toString());
+						// Comment out this line for scailability test
+						//this.queue.timeout();
+					}
+				    } catch (Exception e) {
+						print(row[0] + ": " + e.toString().split("\n")[0]);
+						print("Replacing driver after exception.");
+						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+						driver = replaceDriver(driver,cap);
+						print(driver.toString());
+						// Comment out this line for scailability test
+						//this.queue.timeout();
+					} finally {
+						// Comment out this line for scailability test
+						//this.queue.done();
+					}	
 				}
 			}
 			
 	        //Close the browser
+			print("Quiting driver at end of tasks.");
 	        driver.quit();
 	    }
-	    
-		public WebDriver replaceDriver(WebDriver driver, DesiredCapabilities cap){
-			driver.quit();
-			//in case anything goes wrong, let's check for defunct processes
-			try {
-				String result = execToString("ps -e");
-				
-				String[] lines = result.split(System.getProperty("line.separator"));
-				String lastFirefox = "";
-				for (int i = 0; i<lines.length; i++){
-					String l = lines[i];
-					if (l.contains("firefox") && l.contains("defunct")){
-						System.out.println("Killing: "+lastFirefox);
-						execToString("kill "+lastFirefox);
-					}
-					else if (l.contains("firefox")){
-						lastFirefox = l.trim().split(" ")[0];
-					}
-				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-			return newDriver(cap);
-		}
 		
 		public String execToString(String command) throws Exception {
 		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -496,7 +524,7 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input-filtered-50.csv";
+		String input1 = "resources/input-filtered-30.csv";
 		//String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
@@ -522,13 +550,15 @@ public class JavaScriptTestingParallelWorkStealing {
 		int threads = 8;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
+		
+		
 		system.startSession();
 		system.stage(input1,javaScript1,output1,jquery,threads);
 		system.stage(input2,javaScript2,output2,jquery,threads);
 		system.stage(input3,javaScript3,output3,jquery,threads);
-		system.stage(input4,javaScript4,output4,jquery,threads);
+		//system.stage(input4,javaScript4,output4,jquery,threads);
 		system.endSession();
-        
+		        
 		system.startSession();
 		system.stage(input4,javaScript4,output5,jquery,threads);
 		system.endSession();
