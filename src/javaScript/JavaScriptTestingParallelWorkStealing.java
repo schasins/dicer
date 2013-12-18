@@ -376,6 +376,16 @@ public class JavaScriptTestingParallelWorkStealing {
 			case 4:
 				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return moveAround();");
 				break;
+			case 5:
+				/*System.out.println("MODIFY DOM 5");
+				ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[1]/DIV[1]/SPAN[1]/SPAN[1]\").textContent;");
+				System.out.println(ans.toString());*/
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return changeText();");
+				/*ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[1]/DIV[1]/SPAN[1]/SPAN[1]\").textContent;");
+				System.out.println(ans.toString());*/
+				break;
 			}
 		}
 		
