@@ -3,7 +3,7 @@ package javaScript;
 public class TestUnderSimulator {
 
 	public static void main(String[] args) {
-		String input1 = "resources/yahoo-wiki.csv";
+		String input1 = "resources/simulator.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths.csv";
 
@@ -17,16 +17,17 @@ public class TestUnderSimulator {
 		
 		String input4 = "resources/savedNodes.csv";
 		String javaScript4 = "resources/nodeRetrieving.js";
-		String output4 = "resources/nodeRetrieval-SameSession.csv";
+		String output4 = "resources/nodeRetrieval0.csv";
 
-		String output5 = "resources/nodeRetrieval-DiffSession1.csv";
-		String output6 = "resources/nodeRetrieval-DiffSession2.csv";
-		String output7 = "resources/nodeRetrieval-DiffSession3.csv";
-		String output8 = "resources/nodeRetrieval-DiffSession4.csv";
+		String output5 = "resources/nodeRetrieval1.csv";
+		String output6 = "resources/nodeRetrieval2.csv";
+		String output7 = "resources/nodeRetrieval3.csv";
+		String output8 = "resources/nodeRetrieval4.csv";
+		String output9 = "resources/nodeRetrieval5.csv";
 		
 		
 		Boolean jquery = false;
-		int threads = 4;
+		int threads = 8;
 		
 		long start,stop;
 		JavaScriptTestingParallelWorkStealing system;
@@ -70,13 +71,22 @@ public class TestUnderSimulator {
 		System.out.print("TIME 3: ");
 		System.out.println((stop-start)/1000);
 
-		// Session 3
+		// Session 4
 		System.out.println("MODIFY DOM #4");
 		start = System.currentTimeMillis();
 		system = new JavaScriptTestingParallelWorkStealing(4);
 		system.stage(input4,javaScript4,output8,jquery,threads);
 		stop = System.currentTimeMillis();
 		System.out.print("TIME 4: ");
+		System.out.println((stop-start)/1000);
+
+		// Session 5
+		System.out.println("MODIFY DOM #5");
+		start = System.currentTimeMillis();
+		system = new JavaScriptTestingParallelWorkStealing(5);
+		system.stage(input4,javaScript4,output9,jquery,threads);
+		stop = System.currentTimeMillis();
+		System.out.print("TIME 5: ");
 		System.out.println((stop-start)/1000);
 		
 		system.endSession();

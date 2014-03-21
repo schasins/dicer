@@ -11,7 +11,7 @@ public class DOMModifierTest {
 		Boolean jquery = false;
 		int threads = 1;
 		
-		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing(2);
+		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing(5);
 		system.startSession();
 		system.stage(input1,javaScript1,output1,jquery,threads);
 		system.endSession();

@@ -177,12 +177,12 @@ public class JavaScriptTestingParallelWorkStealingTime {
 	}
 	
 	public static void main(String[] args) {
-		String inputFile = "resources/input.csv";
+		String inputFile = "resources/input-filtered-200.csv";
 		String javaScriptFile = "resources/titleExtractor.js";
-		String outputFile = "resources/output.csv";
+		String outputFile = "resources/output-200.csv";
 		
 		JavaScriptTestingParallelWorkStealingTime runner = new JavaScriptTestingParallelWorkStealingTime(inputFile,javaScriptFile,outputFile);
-		runner.execute(4);
+		runner.execute(8);
 	}
 
 }

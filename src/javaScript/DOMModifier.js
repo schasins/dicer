@@ -85,6 +85,21 @@ var moveAround = function () {
   }
 };
 
+var changeTextInner = function(x) {
+  if(x.childNodes.length == 0) {
+    x.textContent = x.textContent + "x";
+    console.log(x);
+  } else {
+    for(var i = 0; i < x.childNodes.length; i++) {
+      changeTextInner(x.childNodes[i]);
+    }
+  }
+};
+
+var changeText = function() {
+  changeTextInner(document.body);
+};
+
 var getElementByXpath = function (path) {
     return document.evaluate(path, document, null, 9, null).singleNodeValue;
 };

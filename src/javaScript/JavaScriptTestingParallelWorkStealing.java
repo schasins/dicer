@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -44,12 +45,15 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
+	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
 	static int DOMChange;
 	
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
+	// Number of done jobs
+	static int finishedJobs;
 	
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
@@ -141,6 +145,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void execute(int threads){
+		long start = System.currentTimeMillis();
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
@@ -154,6 +159,11 @@ public class JavaScriptTestingParallelWorkStealing {
 		for (Thread thread : threadList) {
 		    try {thread.join();} catch (InterruptedException e) {System.out.println("Could not join thread.");}
 		}
+
+		long stop = System.currentTimeMillis();
+		String[] times = new String[1];
+		times[0] = String.valueOf((stop-start)/1000);
+		this.writer.writeNext(times);
 		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
@@ -190,9 +200,22 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	private class TaskQueue {
 		List<String[]> rows;
+		int count, timeout;
+		long start;
 		
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
+			// Comment out this line for scailability test
+			/*this.count = 0;
+			this.timeout = 0;
+			start = System.currentTimeMillis();
+			try {
+				PrintWriter output = new PrintWriter(new FileWriter("time.csv"));
+				output.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 		}
 		
 		public synchronized String[] pop(){
@@ -202,6 +225,27 @@ public class JavaScriptTestingParallelWorkStealing {
 				return row;
 			}
 			return null;
+		}
+		
+		// Scalability test only
+		public synchronized void timeout() {
+			timeout++;
+		}
+
+		// Scalability test only
+		public synchronized void done() {
+			count++;
+			if(count%100 == 0) {
+				try {
+					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
+					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
+					output.write("," + timeout + "\n");
+					output.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		public boolean empty(){
@@ -255,7 +299,6 @@ public class JavaScriptTestingParallelWorkStealing {
 		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-				
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
 	            
@@ -265,6 +308,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+			
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -339,6 +383,16 @@ public class JavaScriptTestingParallelWorkStealing {
 				break;
 			case 4:
 				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return moveAround();");
+				break;
+			case 5:
+				/*System.out.println("MODIFY DOM 5");
+				ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[1]/DIV[1]/SPAN[1]/SPAN[1]\").textContent;");
+				System.out.println(ans.toString());*/
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return changeText();");
+				/*ans = ((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+
+						" return getElementByXpath(\"HTML/BODY/DIV[1]/DIV[1]/DIV[1]/SPAN[1]/SPAN[1]\").textContent;");
+				System.out.println(ans.toString());*/
 				break;
 			}
 		}
@@ -447,11 +501,13 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 10, TimeUnit.SECONDS, false);
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
+						// Comment out this line for scailability test
+						//this.queue.timeout();
 					}
 				    } catch (Exception e) {
 						print(row[0] + ": " + e.toString().split("\n")[0]);
@@ -459,7 +515,12 @@ public class JavaScriptTestingParallelWorkStealing {
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
-					}
+						// Comment out this line for scailability test
+						//this.queue.timeout();
+					} finally {
+						// Comment out this line for scailability test
+						//this.queue.done();
+					}	
 				}
 			}
 			
