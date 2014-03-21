@@ -17,10 +17,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -44,8 +48,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	static String DOMModifierFunctions;
 	static int DOMChange;
 	
-	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
-	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
+	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
 	
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
@@ -251,8 +255,13 @@ public class JavaScriptTestingParallelWorkStealing {
 		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			WebDriver driver = new FirefoxDriver(cap);
+				
+			FirefoxProfile profile = new ProfilesIni().getProfile("default");
+	        profile.setPreference("network.cookie.cookieBehavior", 2);
+	            
+			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
+	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
 			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
@@ -472,26 +481,26 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input-filtered-30.csv";
+		String input1 = "resources/input-filtered-50.csv";
 		//String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
-		String output1 = "resources/xpaths.csv";
+		String output1 = "resources/xpaths-2.csv";
 
-		String input2 = "resources/xpaths.csv";
+		String input2 = "resources/xpaths-2.csv";
 		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/filteredXpaths.csv";
+		String output2 = "resources/filteredXpaths-2.csv";
 
-		String input3 = "resources/filteredXpaths.csv";
+		String input3 = "resources/filteredXpaths-2.csv";
 		String javaScript3 = "resources/nodeSaving.js";
-		String output3 = "resources/savedNodes.csv";
+		String output3 = "resources/savedNodes-2.csv";
 		
-		String input4 = "resources/savedNodes.csv";
+		String input4 = "resources/savedNodes-2.csv";
 		String javaScript4 = "resources/nodeRetrieving.js";
-		String output4 = "resources/nodeRetrieval1-SameSession.csv";
+		String output4 = "resources/nodeRetrieval1-SameSession-2.csv";
 
-		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose.csv";
+		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose-2.csv";
 		
-		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar.csv";
+		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar-2.csv";
 		
 		
 		Boolean jquery = false;
@@ -499,17 +508,27 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
+		Boolean firstSession = true;
 		
-		system.startSession();
-		system.stage(input1,javaScript1,output1,jquery,threads);
-		system.stage(input2,javaScript2,output2,jquery,threads);
-		system.stage(input3,javaScript3,output3,jquery,threads);
-		//system.stage(input4,javaScript4,output4,jquery,threads);
-		system.endSession();
+		if (firstSession){
+			system.startSession();
+			system.stage(input1,javaScript1,output1,jquery,threads);
+			system.stage(input2,javaScript2,output2,jquery,threads);
+			system.stage(input3,javaScript3,output3,jquery,threads);
+			system.stage(input4,javaScript4,output4,jquery,threads);
+			system.endSession();
+			
+			system.startSession();
+			system.stage(input4,javaScript4,output5,jquery,threads);
+			system.endSession();
+		}
+		else{
+			system.startSession();
+			system.stage(input4,javaScript4,output6,jquery,threads);
+			system.endSession();
+		}
 		        
-		system.startSession();
-		system.stage(input4,javaScript4,output5,jquery,threads);
-		system.endSession();
+
 	}
 
 }
