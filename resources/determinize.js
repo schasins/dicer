@@ -1,7 +1,7 @@
 function determinize(millis_str){
 
     var OrigDate = Date;
-    var Date = function(){return new OrigDate(millis_str);}
+    Date = function(){return new OrigDate(millis_str);}
     
     Math.seedrandom(millis_str);
 }
