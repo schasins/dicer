@@ -46,6 +46,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	Boolean jquery;
 	int stages;
 	
+	String determinizeCode;
+	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
 	static int DOMChange;
@@ -149,7 +151,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i, this.determinizeCode);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -182,6 +184,11 @@ public class JavaScriptTestingParallelWorkStealing {
 			e.printStackTrace();
 		}
 		
+		try{
+			this.determinizeCode = new Scanner(new File("resources/determinize.js")).useDelimiter("\\Z").next();
+			this.determinizeCode.concat("determinize("+System.currentTimeMillis()+");");
+		}
+		catch(Exception e){System.out.println("Failed to open determinize input file."); return;}
 	}
 	
 	public void endSession(){
@@ -262,8 +269,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		Boolean jquery;
 		Boolean verbose = true;
 		int index;
+		String determinizeCode;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i){
+		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i, String determinizeCode){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
@@ -271,6 +279,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.subalgorithms = subalgorithms;
 			this.jquery = jquery;
 			this.index = i;
+			this.determinizeCode = determinizeCode;
 		}
 		
 		public void print(String s){
@@ -305,9 +314,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(40, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(40, TimeUnit.SECONDS);
 			
 			return driver;
 			}
@@ -348,6 +357,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		private void loadPage(WebDriver driver, String url) {
 			driver.get(url);
+
+			((JavascriptExecutor) driver).executeScript(this.determinizeCode);
 			// TODO: modify DOM here.
 			Object ans;
 			switch(DOMChange) {
@@ -412,7 +423,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        try{
 		        for (int j = 0; j<this.algorithms; j++){
 			        //reload for each algorithm
-		        	loadPage(driver,url);
+		        	loadPage(driver,url,determinize);
 
 					char letter = ((char) ((int) 'a' + j));
 			        int algorithmSubalgorithms = this.subalgorithms.get(j);
@@ -454,8 +465,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		        }
 	        }
 			catch(WebDriverException e){
+				
+				print(url + ": " + e.toString().split("\n")[0]);
 				/*
-				System.out.println(url + ": " + e.toString().split("\n")[0]);
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 				driver.quit();
 				driver = newDriver(cap);
@@ -501,7 +513,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 10, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 125, TimeUnit.SECONDS, false);
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
@@ -542,7 +554,7 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	
 	public static void main(String[] args) {
-		String input1 = "resources/input-filtered-50.csv";
+		String input1 = "resources/input-filtered-30.csv";
 		//String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
 		String output1 = "resources/xpaths-2.csv";
