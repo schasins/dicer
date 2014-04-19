@@ -57,9 +57,19 @@ public class JavaScriptTestingParallelWorkStealing {
 	// Number of done jobs
 	static int finishedJobs;
 
+	static String run_id;
+	
+
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
 		this.DOMChange = 0;
+		run_id = "";
+	}
+
+	JavaScriptTestingParallelWorkStealing(String id) {
+		stages = 0;
+		this.DOMChange = 0;
+		run_id = id;
 	}
 
 	JavaScriptTestingParallelWorkStealing(int DOMChange) {
