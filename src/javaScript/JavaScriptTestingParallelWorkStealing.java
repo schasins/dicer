@@ -252,9 +252,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		// Scalability test only
 		public synchronized void done() {
 			count++;
-			if(count%100 == 0) {
+			if(count%20 == 0) {
 				try {
-					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
+					PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv", true));
 					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
 					output.write("," + timeout + "\n");
 					output.close();
