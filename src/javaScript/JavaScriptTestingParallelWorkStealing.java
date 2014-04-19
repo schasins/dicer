@@ -45,6 +45,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
+	static String run_id;
 	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
@@ -58,6 +59,13 @@ public class JavaScriptTestingParallelWorkStealing {
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
 		this.DOMChange = 0;
+		run_id = "";
+	}
+	
+	JavaScriptTestingParallelWorkStealing(String id) {
+		stages = 0;
+		this.DOMChange = 0;
+		run_id = id;
 	}
 	
 	JavaScriptTestingParallelWorkStealing(int DOMChange) {
@@ -188,6 +196,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		System.out.println("Ending session.");
 		Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
+		// Comment in for scalability test	
+		/*
 		try {
 			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
 			p.waitFor();
@@ -195,7 +205,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	private class TaskQueue {
@@ -205,17 +215,17 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
-			// Comment out this line for scailability test
-			/*this.count = 0;
+			// Comment out this line for scalability test
+			this.count = 0;
 			this.timeout = 0;
 			start = System.currentTimeMillis();
 			try {
-				PrintWriter output = new PrintWriter(new FileWriter("time.csv"));
+				PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv"));
 				output.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
 		}
 		
 		public synchronized String[] pop(){
@@ -235,9 +245,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		// Scalability test only
 		public synchronized void done() {
 			count++;
-			if(count%100 == 0) {
+			if(count%20 == 0) {
 				try {
-					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
+					PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv", true));
 					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
 					output.write("," + timeout + "\n");
 					output.close();
@@ -506,8 +516,8 @@ public class JavaScriptTestingParallelWorkStealing {
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
-						// Comment out this line for scailability test
-						//this.queue.timeout();
+						// Comment out this line for scalability test
+						this.queue.timeout();
 					}
 				    } catch (Exception e) {
 						print(row[0] + ": " + e.toString().split("\n")[0]);
@@ -515,11 +525,11 @@ public class JavaScriptTestingParallelWorkStealing {
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
-						// Comment out this line for scailability test
-						//this.queue.timeout();
+						// Comment out this line for scalability test
+						this.queue.timeout();
 					} finally {
-						// Comment out this line for scailability test
-						//this.queue.done();
+						// Comment out this line for scalability test
+						this.queue.done();
 					}	
 				}
 			}
