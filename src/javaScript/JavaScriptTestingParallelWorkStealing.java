@@ -223,7 +223,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
 			// Comment out this line for scailability test
-			/*this.count = 0;
+			this.count = 0;
 			this.timeout = 0;
 			start = System.currentTimeMillis();
 			try {
@@ -232,7 +232,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
 		}
 
 		public synchronized String[] pop(){
@@ -525,7 +525,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
 						// Comment out this line for scailability test
-						//this.queue.timeout();
+						this.queue.timeout();
 					}
 				    } catch (Exception e) {
 						print(row[0] + ": " + e.toString().split("\n")[0]);
@@ -534,10 +534,10 @@ public class JavaScriptTestingParallelWorkStealing {
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
 						// Comment out this line for scailability test
-						//this.queue.timeout();
+						this.queue.timeout();
 					} finally {
 						// Comment out this line for scailability test
-						//this.queue.done();
+						this.queue.done();
 					}	
 				}
 			}
