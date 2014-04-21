@@ -227,7 +227,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.timeout = 0;
 			start = System.currentTimeMillis();
 			try {
-				PrintWriter output = new PrintWriter(new FileWriter("time.csv"));
+				PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv"));
 				output.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -502,9 +502,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	    public void run() {
 			String PROXY = "localhost:1234";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
-			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
+			//proxy.setHttpProxy(PROXY).setNoProxy("https:*");
 			DesiredCapabilities cap = new DesiredCapabilities();
-			cap.setCapability(CapabilityType.PROXY, proxy);
+			//cap.setCapability(CapabilityType.PROXY, proxy);
 
 			WebDriver driver = newDriver(cap);
 
