@@ -53,11 +53,13 @@ public class JavaScriptTestingParallelWorkStealing {
 	static int DOMChange;
 
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
-	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
+	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
 	// Number of done jobs
 	static int finishedJobs;
 
 	static String run_id;
+	
+	Process proxyserv;
 	
 
 	JavaScriptTestingParallelWorkStealing() {
@@ -194,11 +196,14 @@ public class JavaScriptTestingParallelWorkStealing {
 			e.printStackTrace();
 		}
 
-		try{
-			this.determinizeCode = new Scanner(new File("resources/determinize.js")).useDelimiter("\\Z").next();
-			this.determinizeCode.concat("determinize("+System.currentTimeMillis()+");");
+		try {
+			String command = "python proxyserv.py -c -i "+String.valueOf(System.currentTimeMillis());
+			System.out.println(command);
+			this.proxyserv = Runtime.getRuntime().exec(command,null, new File(path_to_proxyserver));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		catch(Exception e){System.out.println("Failed to open determinize input file."); return;}
 	}
 
 	public void endSession(){
@@ -209,6 +214,8 @@ public class JavaScriptTestingParallelWorkStealing {
 			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
 			p.waitFor();
 			System.out.print("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+			this.proxyserv.destroy();
+			System.out.println("Quitting proxyserver.");
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -318,6 +325,11 @@ public class JavaScriptTestingParallelWorkStealing {
 			try{
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
+	        profile.setPreference("network.http.max-connections",255);
+	        profile.setPreference("network.http.max-connections-per-proxy",255);
+	        profile.setPreference("network.http.max-connections-per-server",255);
+	        profile.setPreference("network.http.max-persistent-connections-per-proxy",255);
+	        profile.setPreference("network.http.max-persistent-connections-per-server",255);
 
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
@@ -502,9 +514,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	    public void run() {
 			String PROXY = "localhost:1234";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
-			//proxy.setHttpProxy(PROXY).setNoProxy("https:*");
+			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
 			DesiredCapabilities cap = new DesiredCapabilities();
-			//cap.setCapability(CapabilityType.PROXY, proxy);
+			cap.setCapability(CapabilityType.PROXY, proxy);
 
 			WebDriver driver = newDriver(cap);
 

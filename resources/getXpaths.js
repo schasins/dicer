@@ -8,7 +8,7 @@ var actualUrl = window.location.href;
 function walkTheDOM(node, xpath) {
 
     if (!first){
-    	output+=("@#@"+url+"<,>"+xpath+"<,>"+actualUrl);
+    	output+=("@#@"+url+"<,>"+xpath+"<,>"+actualUrl+"<,>"+node.textContent);
     	}
     else {
        first = false;

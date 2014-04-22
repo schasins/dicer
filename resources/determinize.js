@@ -1,6 +1,3 @@
-
-<script>
-
 /**
  * All code is in an anonymous closure to keep the global namespace clean.
  */
@@ -196,8 +193,6 @@ if (module && module.exports) {
 	Date = function(){return new OrigDate(millis);};
 	
 	Math.seedrandom(millis);
-}
- 
 
-determinize();
-</script>
+	window.performance.timing = {};
+}
