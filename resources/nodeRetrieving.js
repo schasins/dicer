@@ -220,10 +220,10 @@ var xPathToNode;
   getTarget = function(targetInfo) {
     var targets = getTargetFunction(targetInfo);
     if (!targets) {
-      log.debug('No target found');
-      return null
+      //log.debug('No target found');
+      return null;
     } else if (targets.length > 1) {
-      log.debug('Multiple targets found:', targets);
+      //log.debug('Multiple targets found:', targets);
       return targets[0];
     } else {
       return targets[0];

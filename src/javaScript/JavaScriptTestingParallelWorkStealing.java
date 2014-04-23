@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,10 +18,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -40,12 +45,17 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
+	
+	String determinizeCode;
+	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
 	static int DOMChange;
 	
-	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
-	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
+	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cache-proxy-server/";
+	// Number of done jobs
+	static int finishedJobs;
 	
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
@@ -137,10 +147,11 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void execute(int threads){
+		long start = System.currentTimeMillis();
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i, this.determinizeCode);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -150,6 +161,11 @@ public class JavaScriptTestingParallelWorkStealing {
 		for (Thread thread : threadList) {
 		    try {thread.join();} catch (InterruptedException e) {System.out.println("Could not join thread.");}
 		}
+
+		long stop = System.currentTimeMillis();
+		String[] times = new String[1];
+		times[0] = String.valueOf((stop-start)/1000);
+		this.writer.writeNext(times);
 		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
@@ -168,6 +184,11 @@ public class JavaScriptTestingParallelWorkStealing {
 			e.printStackTrace();
 		}
 		
+		try{
+			this.determinizeCode = new Scanner(new File("resources/determinize.js")).useDelimiter("\\Z").next();
+			this.determinizeCode.concat("determinize("+System.currentTimeMillis()+");");
+		}
+		catch(Exception e){System.out.println("Failed to open determinize input file."); return;}
 	}
 	
 	public void endSession(){
@@ -186,9 +207,22 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	private class TaskQueue {
 		List<String[]> rows;
+		int count, timeout;
+		long start;
 		
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
+			// Comment out this line for scailability test
+			/*this.count = 0;
+			this.timeout = 0;
+			start = System.currentTimeMillis();
+			try {
+				PrintWriter output = new PrintWriter(new FileWriter("time.csv"));
+				output.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 		}
 		
 		public synchronized String[] pop(){
@@ -198,6 +232,27 @@ public class JavaScriptTestingParallelWorkStealing {
 				return row;
 			}
 			return null;
+		}
+		
+		// Scalability test only
+		public synchronized void timeout() {
+			timeout++;
+		}
+
+		// Scalability test only
+		public synchronized void done() {
+			count++;
+			if(count%100 == 0) {
+				try {
+					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
+					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
+					output.write("," + timeout + "\n");
+					output.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		public boolean empty(){
@@ -214,8 +269,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		Boolean jquery;
 		Boolean verbose = true;
 		int index;
+		String determinizeCode;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i){
+		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i, String determinizeCode){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
@@ -223,6 +279,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.subalgorithms = subalgorithms;
 			this.jquery = jquery;
 			this.index = i;
+			this.determinizeCode = determinizeCode;
 		}
 		
 		public void print(String s){
@@ -251,11 +308,16 @@ public class JavaScriptTestingParallelWorkStealing {
 		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			WebDriver driver = new FirefoxDriver(cap);
+			FirefoxProfile profile = new ProfilesIni().getProfile("default");
+	        profile.setPreference("network.cookie.cookieBehavior", 2);
+	            
+			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
-			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
+			driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(40, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(40, TimeUnit.SECONDS);
+			
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -295,6 +357,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		private void loadPage(WebDriver driver, String url) {
 			driver.get(url);
+
+			((JavascriptExecutor) driver).executeScript(this.determinizeCode);
 			// TODO: modify DOM here.
 			Object ans;
 			switch(DOMChange) {
@@ -359,7 +423,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        try{
 		        for (int j = 0; j<this.algorithms; j++){
 			        //reload for each algorithm
-		        	loadPage(driver,url);
+		        	loadPage(driver,url,determinize);
 
 					char letter = ((char) ((int) 'a' + j));
 			        int algorithmSubalgorithms = this.subalgorithms.get(j);
@@ -401,8 +465,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		        }
 	        }
 			catch(WebDriverException e){
+				
+				print(url + ": " + e.toString().split("\n")[0]);
 				/*
-				System.out.println(url + ": " + e.toString().split("\n")[0]);
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 				driver.quit();
 				driver = newDriver(cap);
@@ -448,11 +513,13 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 30, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 125, TimeUnit.SECONDS, false);
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
+						// Comment out this line for scailability test
+						//this.queue.timeout();
 					}
 				    } catch (Exception e) {
 						print(row[0] + ": " + e.toString().split("\n")[0]);
@@ -460,7 +527,12 @@ public class JavaScriptTestingParallelWorkStealing {
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
-					}
+						// Comment out this line for scailability test
+						//this.queue.timeout();
+					} finally {
+						// Comment out this line for scailability test
+						//this.queue.done();
+					}	
 				}
 			}
 			
@@ -485,23 +557,23 @@ public class JavaScriptTestingParallelWorkStealing {
 		String input1 = "resources/input-filtered-30.csv";
 		//String input1 = "resources/input-baidu.csv";
 		String javaScript1 = "resources/getXpaths.js";
-		String output1 = "resources/xpaths.csv";
+		String output1 = "resources/xpaths-2.csv";
 
-		String input2 = "resources/xpaths.csv";
+		String input2 = "resources/xpaths-2.csv";
 		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/filteredXpaths.csv";
+		String output2 = "resources/filteredXpaths-2.csv";
 
-		String input3 = "resources/filteredXpaths.csv";
+		String input3 = "resources/filteredXpaths-2.csv";
 		String javaScript3 = "resources/nodeSaving.js";
-		String output3 = "resources/savedNodes.csv";
+		String output3 = "resources/savedNodes-2.csv";
 		
-		String input4 = "resources/savedNodes.csv";
+		String input4 = "resources/savedNodes-2.csv";
 		String javaScript4 = "resources/nodeRetrieving.js";
-		String output4 = "resources/nodeRetrieval1-SameSession.csv";
+		String output4 = "resources/nodeRetrieval1-SameSession-2.csv";
 
-		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose.csv";
+		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose-2.csv";
 		
-		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar.csv";
+		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar-2.csv";
 		
 		
 		Boolean jquery = false;
@@ -509,17 +581,27 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
+		Boolean firstSession = true;
 		
-		system.startSession();
-		system.stage(input1,javaScript1,output1,jquery,threads);
-		system.stage(input2,javaScript2,output2,jquery,threads);
-		system.stage(input3,javaScript3,output3,jquery,threads);
-		//system.stage(input4,javaScript4,output4,jquery,threads);
-		system.endSession();
+		if (firstSession){
+			system.startSession();
+			system.stage(input1,javaScript1,output1,jquery,threads);
+			system.stage(input2,javaScript2,output2,jquery,threads);
+			system.stage(input3,javaScript3,output3,jquery,threads);
+			system.stage(input4,javaScript4,output4,jquery,threads);
+			system.endSession();
+			
+			system.startSession();
+			system.stage(input4,javaScript4,output5,jquery,threads);
+			system.endSession();
+		}
+		else{
+			system.startSession();
+			system.stage(input4,javaScript4,output6,jquery,threads);
+			system.endSession();
+		}
 		        
-		system.startSession();
-		system.stage(input4,javaScript4,output5,jquery,threads);
-		system.endSession();
+
 	}
 
 }
