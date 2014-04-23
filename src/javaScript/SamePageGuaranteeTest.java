@@ -21,6 +21,26 @@ public class SamePageGuaranteeTest {
 		}
 		return new ArrayList<String>();
 	}
+	
+	static public List<String> unmatchedLines(String output1, String output2){
+		List<String> first_lines = readFile(output1, Charset.forName("UTF-8"));
+		List<String> second_lines = readFile(output1, Charset.forName("UTF-8"));
+		List<String> unmatched = new ArrayList<String>();
+		for (int i = 0; i<first_lines.size(); i++){
+			String line = first_lines.get(i);
+			if (!second_lines.contains(line)){
+				unmatched.add(line);
+			}
+		}
+		for (int i = 0; i<second_lines.size(); i++){
+			String line = second_lines.get(i);
+			if (!first_lines.contains(line)){
+				unmatched.add(line);
+			}
+		}
+		return unmatched;
+	}
+	
 
 	public static void main(String[] args) {
 
@@ -35,15 +55,27 @@ public class SamePageGuaranteeTest {
 		Boolean jquery = false;
 		JavaScriptTestingParallelWorkStealing system;
 		
-		system = new JavaScriptTestingParallelWorkStealing("xpaths");
-		system.startSession();
-		system.stage(input1,javaScript1,output1,jquery,1);
-		List<String> first_read = readFile(path_to_proxyserver+"content-type.csv", Charset.forName("UTF-8"));
-		system.stage(input1,javaScript1,output2,jquery,1);
-		List<String> second_read = readFile(path_to_proxyserver+"content-type.csv", Charset.forName("UTF-8"));
-		system.endSession();
-		System.out.println(first_read);
-		System.out.println(second_read);
+		Boolean run = false;
+		String fin = "";
+		
+		if (run){
+			system = new JavaScriptTestingParallelWorkStealing("xpaths");
+			system.startSession();
+			system.stage(input1,javaScript1,output1,jquery,1);
+			List<String> first_read = readFile(path_to_proxyserver+"content-type.csv", Charset.forName("UTF-8"));
+			system.stage(input1,javaScript1,output2,jquery,1);
+			List<String> second_read = readFile(path_to_proxyserver+"content-type.csv", Charset.forName("UTF-8"));
+			System.out.println(first_read);
+			fin += first_read;
+			System.out.println(second_read);
+			fin += second_read;
+			system.endSession();
+		}
+		List<String> unmatched = unmatchedLines(output1,output2);
+		System.out.println(unmatched);
+		System.out.println(unmatched.size());
+		System.out.println(fin);
+		
 		return;
 	}
 
