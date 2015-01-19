@@ -52,8 +52,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	static String DOMModifierFunctions;
 	static int DOMChange;
 
-	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
-	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
+	String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
 	// Number of done jobs
 	static int finishedJobs;
 
@@ -185,6 +185,7 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	public void startSession(){
 		System.out.println("Starting session.");
+		/*
 		try {
 			System.out.println("mkdir " + path_to_proxyserver + ".cache");
 			Process p = Runtime.getRuntime().exec("rm -r " + path_to_proxyserver + ".cache");
@@ -194,21 +195,21 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
-		try {
+		/*try {
 			String command = "python proxyserv.py -c -i "+String.valueOf(System.currentTimeMillis());
 			System.out.println(command);
 			this.proxyserv = Runtime.getRuntime().exec(command,null, new File(path_to_proxyserver));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public void endSession(){
 		System.out.println("Ending session.");
-		Date date = new Date();
+		/*Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
 		try {
 			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
@@ -219,7 +220,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	private class TaskQueue {
@@ -259,7 +260,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		// Scalability test only
 		public synchronized void done() {
 			count++;
-			if(count%20 == 0) {
+			if(count%100 == 0) {
 				try {
 					PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv", true));
 					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
@@ -334,9 +335,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(40, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(40, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 
 			return driver;
 			}
@@ -531,7 +532,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 125, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 60, TimeUnit.SECONDS, false);
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
