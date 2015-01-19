@@ -185,6 +185,7 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	public void startSession(){
 		System.out.println("Starting session.");
+		System.out.println(new File(path_to_proxyserver + ".cache").list().length);
 		/*
 		try {
 			System.out.println("mkdir " + path_to_proxyserver + ".cache");
