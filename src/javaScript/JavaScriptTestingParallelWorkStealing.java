@@ -185,7 +185,6 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	public void startSession(){
 		System.out.println("Starting session.");
-		System.out.println(new File(path_to_proxyserver + ".cache").list().length);
 		/*
 		try {
 			System.out.println("mkdir " + path_to_proxyserver + ".cache");
@@ -261,11 +260,12 @@ public class JavaScriptTestingParallelWorkStealing {
 		// Scalability test only
 		public synchronized void done() {
 			count++;
-			if(count%100 == 0) {
+			if(count%10 == 0) {
 				try {
 					PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv", true));
 					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
-					output.write("," + timeout + "\n");
+					output.write("," + timeout );
+					output.write("," + new File(path_to_proxyserver + ".cache").list().length + "\n");
 					output.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
