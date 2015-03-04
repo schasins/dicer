@@ -53,6 +53,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
 	String path_to_proxyserver = "~/Documents/cacheall-proxy-server/";
+
 	// Number of done jobs
 	static int finishedJobs;
 	
@@ -172,6 +173,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		System.out.println("Starting session.");
+		/*
 		try {
 			String[] shCommand = {"/bin/sh", "-c", "mkdir " + path_to_proxyserver + ".cache"}; 
 			System.out.println(shCommand[2]);
@@ -182,13 +184,21 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
+		}*/
+
+		/*try {
+			String command = "python proxyserv.py -c -i "+String.valueOf(System.currentTimeMillis());
+			System.out.println(command);
+			this.proxyserv = Runtime.getRuntime().exec(command,null, new File(path_to_proxyserver));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 	}
 	
 	public void endSession(){
 		System.out.println("Ending session.");
-		Date date = new Date();
+		/*Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
 		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir}; 
 		try {
@@ -198,7 +208,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	private class TaskQueue {
@@ -242,7 +252,8 @@ public class JavaScriptTestingParallelWorkStealing {
 				try {
 					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
 					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
-					output.write("," + timeout + "\n");
+					output.write("," + timeout );
+					output.write("," + new File(path_to_proxyserver + ".cache").list().length + "\n");
 					output.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -313,7 +324,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			driver.manage().timeouts().implicitlyWait(110, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(110, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(110, TimeUnit.SECONDS);
-			
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -510,6 +520,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   
 				   try {
 					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 105, TimeUnit.SECONDS, false);
+
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
