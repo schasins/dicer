@@ -1,0 +1,124 @@
+url;title;start-up;load;execute
+LOAD;4863
+LOAD;10481
+LOAD;12999
+http://google.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+LOAD;18747
+http://facebook.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+LOAD;24390
+http://youtube.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+http://yahoo.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+http://baidu.com;百度一下，你就知道;0;2426;4841;
+LOAD;35750
+LOAD;38937
+http://wikipedia.org;Wikipedia;0;11368;12;
+http://qq.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+http://live.com;Sign In;0;3642;815;
+LOAD;43829
+http://linkedin.com;World's Largest Professional Network | LinkedIn;0;7631;4542;
+http://taobao.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+http://blogspot.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+http://twitter.com;Twitter;0;21220;206;
+http://amazon.com;Amazon.com: Online Shopping for Electronics, Apparel, Computers, Books, DVDs & more;0;20;32968;
+http://google.co.in;Google;0;26441;410;
+http://wordpress.com;WordPress.com - Get a Free Blog Here;0;13083;6224;
+http://ebay.com;org.openqa.selenium.TimeoutException: Timed out waiting for page load.
+http://yahoo.co.jp;Yahoo! JAPAN;0;31933;9;
+http://yandex.ru;Яндекс;0;37219;12;
+http://bing.com;Bing;0;6086;29254;
+http://vk.com;Welcome! | VK;0;31976;11;
+http://google.de;Google;0;65981;5050;
+http://hao123.com;hao123_上网从这里开始;0;74947;6277;
+http://sina.com.cn;新浪首页;0;126333;14;
+http://google.co.jp;Problem loading page;0;95333;22;
+http://google.fr;Google;0;193767;1043;
+http://pinterest.com;Pinterest;0;220580;9;
+http://msn.com;MSN.com;0;208316;9;
+http://163.com;网易;0;241945;49730;
+http://tumblr.com;Sign up | Tumblr;0;309865;10;
+http://googleusercontent.com;Problem loading page;0;19;82089;
+http://google.co.uk;Google;0;15;307995;
+http://apple.com;Apple;0;27011;7;
+http://mail.ru;Mail.Ru: почта, поиск в интернете, новости, игры, развлечения;0;127497;623;
+http://weibo.com;北美微博广场;0;69967;22;
+http://google.ru;Google;0;4807;116;
+http://paypal.com;Send Money, Pay Online or Set Up a Merchant Account - PayPal;0;30104;922;
+http://google.com.hk;Google;0;1483;213;
+http://instagram.com;Instagram;0;7504;14;
+http://blogger.com;Blogger;0;2492;13;
+http://google.com.br;Google;0;19;58359;
+http://google.es;Google;0;2053;6380;
+http://imdb.com;IMDb - Movies, TV and Celebrities;0;6779;4580;
+http://google.it;Google;0;13376;1423;
+http://tmall.com;天猫tmall.com-上天猫，就购了;0;43864;17;
+http://360.cn;360安全中心 - 360安全卫士 - 杀毒软件|免费杀毒软件|企业杀毒软件|安全浏览器;0;16;9124;
+http://soso.com;搜搜更懂你;0;6558;3134;
+http://amazon.co.jp;Amazon.co.jp： 通販 - ファッション、家電から食品まで【無料配送】;0;13390;737;
+http://craigslist.org;craigslist > sites;0;23416;15;
+http://sohu.com;搜狐-中国最大的门户网站;0;30345;8;
+http://xhamster.com;xHamster's Free Porn Videos;0;12425;11;
+http://google.com.mx;Google;0;4586;512;
+http://xvideos.com;Free Porn Videos - XVIDEOS.COM;0;41028;14;
+http://microsoft.com;Microsoft US | Devices and Services;0;201743;16;
+http://ask.com;Ask.com - What's Your Question?;0;325666;1421;
+http://stackoverflow.com;Stack Overflow;0;7673;15;
+http://alibaba.com;Manufacturers, Suppliers, Exporters & Importers from the world's largest online B2B marketplace-Alibaba.com;0;4551;1522;
+http://imgur.com;imgur: the simple image sharer;0;9;7130;
+http://fc2.com;FC2 - Free Website, Analyzer, Blog, Rental Server, SEO Countermeasures, etc. -;0;8582;10;
+http://neobux.com;NeoBux: The Innovation in Paid-to-Click Services;0;11475;8;
+http://google.ca;Google;0;10675;814;
+http://go.com;Go.com | The Walt Disney Company;0;27314;9;
+http://wordpress.org;WordPress › Blog Tool, Publishing Platform, and CMS;0;35;4428;
+http://cnn.com;CNN.com - Breaking News, U.S., World, Weather, Entertainment & Video News;0;14309;2018;
+http://thepiratebay.sx;Download music, movies, games, software! The Pirate Bay - The galaxy's most resilient BitTorrent site;0;8118;9;
+http://t.co;t.co / Twitter;0;33;2096;
+http://adcash.com;Adcash® Advertising Network | International Advertising Platform;0;22879;14;
+http://odnoklassniki.ru;Odnoklassniki;0;22074;2416;
+http://vube.com;Vube.com;0;746;19901;
+http://flickr.com;Welcome to Flickr - Photo Sharing;0;31657;39;
+http://akamaihd.net;Problem loading page;0;218;6143;
+http://amazon.de;Amazon.de: Günstige Preise für Elektronik & Foto, Filme, Musik, Bücher, Games, Spielzeug & mehr;0;602;9741;
+http://bbc.co.uk;BBC - Homepage;0;18;60316;
+http://huffingtonpost.com;Breaking News and Opinion on The Huffington Post;0;41497;3247;
+http://espn.go.com;ESPN: The Worldwide Leader In Sports;0;61;47485;
+http://conduit.com;Engaging People | Conduit;0;33904;1786;
+http://reddit.com;reddit: the front page of the internet;0;30;9807;
+http://aliexpress.com;AliExpress.com - Online Shopping for Electronics, Fashion, Home & Garden, Toys & Sports, Automobiles from China.;0;13595;3116;
+http://adobe.com;Adobe;0;33608;17;
+http://google.com.tr;Google;0;9567;614;
+http://bp.blogspot.com;Problem loading page;0;34;1650;
+http://ebay.de;Elektronik, Autos, Mode, Sammlerstücke, Gutscheine und mehr Online-Shopping | eBay;0;114;9826;
+http://pornhub.com;Free Porn Videos & Sex Movies - Porno, XXX, Porn Tube and Pussy Porn;0;29;12538;
+http://about.com;About.com: Do more.;0;28;8407;
+http://gmw.cn;光明网_新闻视野、文化视角、思想深度、理论高度;0;29921;9;
+http://blogspot.in;Google;0;21864;1435;
+http://godaddy.com;Domain Names | The World's Largest Domain Name Registrar - GoDaddy;0;25;22618;
+http://google.pl;Google;0;48;26646;
+http://youku.com;优酷-中国第一视频网站,提供视频播放,视频发布,视频搜索 - 优酷视频;0;36622;17;
+http://dailymotion.com;Dailymotion - Watch, publish, share videos;0;18280;1421;
+http://google.com.au;Google;0;37669;816;
+http://xinhuanet.com;新华网_传播中国 报道世界;0;36263;16;
+http://ifeng.com;凤凰网;0;36178;14;
+http://ebay.co.uk;Electronics, Cars, Fashion, Collectibles, Coupons and More | eBay;0;36865;5384;
+http://rakuten.co.jp;【楽天市場】Shopping is Entertainment! ： インターネット最大級の通信販売、通販オンラインショッピングコミュニティ;0;61;65824;
+http://ku6.com;酷6网 中国第一视频门户;0;52705;11;
+http://uol.com.br;UOL - O melhor conteúdo;0;61796;15;
+http://amazon.co.uk;Amazon.co.uk: Low Prices in Electronics, Books, Sports Equipment & more;0;42071;19346;
+http://youporn.com;Porn Videos, Sex, XXX, Free Porn Tube - YouPorn;0;24;39163;
+http://kickass.to;Download Torrents. Fast and Free Torrent Downloads - KickassTorrents;0;24028;8;
+http://cnet.com;Product reviews and prices, software downloads, and tech news - CNET;0;70528;13;
+http://netflix.com;Netflix - Watch TV Shows Online, Watch Movies Online;0;67592;5362;
+http://vimeo.com;Vimeo, Your Videos Belong Here;0;73541;17;
+http://sogou.com;搜狗搜索引擎 - 上网从搜狗开始;0;27;12067;
+http://adf.ly;AdFly - The URL shortener service that pays you! Earn money for every visitor to your links.;0;10302;9784;
+http://google.com.ar;Google;0;22788;1020;
+http://themeforest.net;WordPress Themes | Website Templates | Create a Website | ThemeForest;0;22013;4980;
+http://google.com.sa;Google;0;26221;420;
+http://aol.com;AOL.com - News, Sports, Weather, Entertainment, Local & Lifestyle;0;46810;9204;
+http://dropbox.com;Dropbox;0;52939;2748;
+http://amazonaws.com;Amazon Web Services, Cloud Computing: Compute, Storage, Database;0;32041;4355;
+http://livejasmin.com;LiveJasmin.com - The World`s #1 Most Visited Video Chat Community;0;41200;19448;
+http://dailymail.co.uk;Home | Mail Online;0;110292;12700;
+http://indiatimes.com;Indiatimes: India News, Business, Movies, Cricket, Shopping, more...;0;48876;1076;
+http://redtube.com;Free Porn Sex Videos - Redtube - XXX Movies - Home of Videos Porno;0;77630;12;
+http://slideshare.net;Upload & Share PowerPoint presentations, documents, infographics;0;94

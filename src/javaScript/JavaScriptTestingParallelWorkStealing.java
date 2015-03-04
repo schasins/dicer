@@ -45,35 +45,22 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
-
-	String determinizeCode;
-
+	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
 	static int DOMChange;
-
+	
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
-	String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
+	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
+	String path_to_proxyserver = "~/Documents/cacheall-proxy-server/";
 	// Number of done jobs
 	static int finishedJobs;
-
-	static String run_id;
 	
-	Process proxyserv;
-	
-
 	JavaScriptTestingParallelWorkStealing() {
 		stages = 0;
 		this.DOMChange = 0;
-		run_id = "";
 	}
-
-	JavaScriptTestingParallelWorkStealing(String id) {
-		stages = 0;
-		this.DOMChange = 0;
-		run_id = id;
-	}
-
+	
 	JavaScriptTestingParallelWorkStealing(int DOMChange) {
 		stages = 0;
 		this.DOMChange = DOMChange;
@@ -85,18 +72,18 @@ public class JavaScriptTestingParallelWorkStealing {
 			System.exit(1);
 		}
 	}
-
+	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
 		this.stages ++;
 		System.out.println("STAGE "+this.stages);
-
+		
 		this.algorithms = 0;
 		this.subalgorithms = new ArrayList<Integer>();
-
+		
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
-			CSVReader reader = new CSVReader(new FileReader(inputFile));
+			CSVReader reader = new CSVReader(new FileReader(inputFile),',','\'','\0');
 		    rows = reader.readAll();
 		}
 		catch(Exception e){
@@ -141,34 +128,34 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 		System.out.println("algorithms: "+this.algorithms);
 		System.out.println("subalgorithms: "+Arrays.toString(this.subalgorithms.toArray()));
-
+		
 		//Output
 		CSVWriter writer;
 		try{
-			writer = new CSVWriter(new FileWriter(outputFile));
+			writer = new CSVWriter(new FileWriter(outputFile),',','\'','\0');
 		}
 		catch(Exception e){
 			System.out.println("Failed to open output file.");
 			return;
 		}
 		this.writer = writer;
-
+		
 		this.jquery = jquery;
-
+		
 		this.execute(threads);
 	}
-
+	
 	public void execute(int threads){
 		long start = System.currentTimeMillis();
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
-
+		
 		for (int i = 0; i < threads; i++){
 			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
 		}
-
+		
 		//barrier
 		for (Thread thread : threadList) {
 		    try {thread.join();} catch (InterruptedException e) {System.out.println("Could not join thread.");}
@@ -178,70 +165,62 @@ public class JavaScriptTestingParallelWorkStealing {
 		String[] times = new String[1];
 		times[0] = String.valueOf((stop-start)/1000);
 		this.writer.writeNext(times);
-
+		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
 	}
-
+	
 	public void startSession(){
 		System.out.println("Starting session.");
 		try {
-			System.out.println("mkdir " + path_to_proxyserver + ".cache");
-			Process p = Runtime.getRuntime().exec("rm -r " + path_to_proxyserver + ".cache");
+			String[] shCommand = {"/bin/sh", "-c", "mkdir " + path_to_proxyserver + ".cache"}; 
+			System.out.println(shCommand[2]);
+			Process p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
-			p = Runtime.getRuntime().exec("mkdir " + path_to_proxyserver + ".cache");
+			p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		try {
-			String command = "python proxyserv.py -c -i "+String.valueOf(System.currentTimeMillis());
-			System.out.println(command);
-			this.proxyserv = Runtime.getRuntime().exec(command,null, new File(path_to_proxyserver));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
-
+	
 	public void endSession(){
 		System.out.println("Ending session.");
 		Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
+		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir}; 
 		try {
-			Process p = Runtime.getRuntime().exec("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
+			Process p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
-			System.out.print("mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir);
-			this.proxyserv.destroy();
-			System.out.println("Quitting proxyserver.");
+			System.out.print(shCommand[2]);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
+	
 	private class TaskQueue {
 		List<String[]> rows;
 		int count, timeout;
 		long start;
-
+		
 		public TaskQueue(List<String[]> rows){
 			this.rows = rows;
 			// Comment out this line for scailability test
-			this.count = 0;
+			/*this.count = 0;
 			this.timeout = 0;
 			start = System.currentTimeMillis();
 			try {
-				PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv"));
+				PrintWriter output = new PrintWriter(new FileWriter("time.csv"));
 				output.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
-
+		
 		public synchronized String[] pop(){
 			if (this.rows.size()>0){
 				String[] row = this.rows.get(0);
@@ -250,7 +229,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 			return null;
 		}
-
+		
 		// Scalability test only
 		public synchronized void timeout() {
 			timeout++;
@@ -259,9 +238,9 @@ public class JavaScriptTestingParallelWorkStealing {
 		// Scalability test only
 		public synchronized void done() {
 			count++;
-			if(count%20 == 0) {
+			if(count%100 == 0) {
 				try {
-					PrintWriter output = new PrintWriter(new FileWriter("time" + run_id + ".csv", true));
+					PrintWriter output = new PrintWriter(new FileWriter("time.csv", true));
 					output.write(count + "," + (System.currentTimeMillis()-start)/1000);
 					output.write("," + timeout + "\n");
 					output.close();
@@ -271,12 +250,12 @@ public class JavaScriptTestingParallelWorkStealing {
 				}
 			}
 		}
-
+		
 		public boolean empty(){
 			return this.rows.size() == 0;
 		}
 	}
-
+	
 	private static class RunTests implements Runnable {
 		TaskQueue queue;
 		String javaScriptFunction;
@@ -286,7 +265,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		Boolean jquery;
 		Boolean verbose = true;
 		int index;
-
+		
 		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
@@ -296,11 +275,11 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.jquery = jquery;
 			this.index = i;
 		}
-
+		
 		public void print(String s){
 			System.out.println("["+this.index+"]"+s);
 		}
-
+		
 		/*
 		 public Boolean waitForPageLoaded(WebDriver driver) {
 		     ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
@@ -319,35 +298,32 @@ public class JavaScriptTestingParallelWorkStealing {
 		      return true;
 		 } 
 		 */
-
+		
 		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
-	        profile.setPreference("network.http.max-connections",255);
-	        profile.setPreference("network.http.max-connections-per-proxy",255);
-	        profile.setPreference("network.http.max-connections-per-server",255);
-	        profile.setPreference("network.http.max-persistent-connections-per-proxy",255);
-	        profile.setPreference("network.http.max-persistent-connections-per-server",255);
-
+	        profile.setPreference("dom.max_script_run_time", 300);
+	        profile.setPreference("dom.max_chrome_script_run_time", 300);
+	            
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(40, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(40, TimeUnit.SECONDS);
-
+			driver.manage().timeouts().implicitlyWait(110, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(110, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(110, TimeUnit.SECONDS);
+			
 			return driver;
 			}
 			catch (WebDriverException exc){
-				print("WebDriver excpetion trying to create new driver.");
+				print("WebDriver exception trying to create new driver.");
 				print(exc.toString().split("\n")[0]);
 				return replaceDriver(null,cap);
 			}
-
+			
 		}
-
+		
 
 		//quits the original driver, checks for defunct processes, calls newDriver to actually create new driver
 		public WebDriver replaceDriver(WebDriver driver, DesiredCapabilities cap){
@@ -355,7 +331,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			//in case anything goes wrong, let's check for defunct processes
 			try {
 				String result = execToString("ps -e");
-
+				
 				String[] lines = result.split(System.getProperty("line.separator"));
 				String lastFirefox = "";
 				for (int i = 0; i<lines.length; i++){
@@ -374,7 +350,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 			return newDriver(cap);
 		}
-
+		
 		private void loadPage(WebDriver driver, String url) {
 			driver.get(url);
 			// TODO: modify DOM here.
@@ -425,19 +401,22 @@ public class JavaScriptTestingParallelWorkStealing {
 				break;
 			}
 		}
-
+		
 		public Boolean processRow(WebDriver driver, String[] row, DesiredCapabilities cap){
 			String url = row[0];
 			if (!url.startsWith("http")){url = "http://"+url;}
 
 	        //make the argString, since that will be the same across algorithms and subalgorithms
 	        for(int j = 0; j < row.length; j++){
-	            row[j] = "'"+row[j]+"'";
+	        	String cell = row[j];
+	        	cell = cell.replace("\\","\\\\"); //escape slashes
+	        	cell = cell.replace("\"","\\\""); //escape double quotes
+	            row[j] = "\""+cell+"\"";
 	        }
 			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
 
 	        List<String> ansList = new ArrayList<String>();
-
+	        
 	        try{
 		        for (int j = 0; j<this.algorithms; j++){
 			        //reload for each algorithm
@@ -455,11 +434,11 @@ public class JavaScriptTestingParallelWorkStealing {
 							catch(Exception e){print("Failed to open jquery file."); return true;}
 					        ((JavascriptExecutor) driver).executeScript(jqueryCode);
 				        }
-
+				        
 				        //System.out.println(this.javaScriptFunction+" return func"+(i+1)+"("+argString+");");
 				        Object ans = ((JavascriptExecutor) driver).executeScript(this.javaScriptFunction+" return func_"+letter+(i+1)+"("+argString+");");
-
-
+						
+						
 						if(i == (algorithmSubalgorithms-1)){
 							if (ans != null){
 								ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
@@ -483,8 +462,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		        }
 	        }
 			catch(WebDriverException e){
-
-				print(url + ": " + e.toString().split("\n")[0]);
+				System.out.println(url + ": " + e.toString());
 				/*
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 				driver.quit();
@@ -494,7 +472,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 	        return true;
 		}
-
+		
 		public class ProcessRow implements Callable<Boolean>{
 		    private final WebDriver driver;
 		    private final String[] row;
@@ -510,14 +488,14 @@ public class JavaScriptTestingParallelWorkStealing {
 		    	return processRow(driver,row,cap);
 		    }
 		}
-
+		
 	    public void run() {
-			String PROXY = "localhost:1234";
+			String PROXY = "localhost:1235";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
 			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
 			DesiredCapabilities cap = new DesiredCapabilities();
 			cap.setCapability(CapabilityType.PROXY, proxy);
-
+			
 			WebDriver driver = newDriver(cap);
 
 			if (driver instanceof JavascriptExecutor) {
@@ -527,17 +505,17 @@ public class JavaScriptTestingParallelWorkStealing {
 					if (row == null){
 						break; //the queue is empty
 					}
-
+					
 				   TimeLimiter limiter = new SimpleTimeLimiter();
-
+				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 125, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 105, TimeUnit.SECONDS, false);
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
 						// Comment out this line for scailability test
-						this.queue.timeout();
+						//this.queue.timeout();
 					}
 				    } catch (Exception e) {
 						print(row[0] + ": " + e.toString().split("\n")[0]);
@@ -546,19 +524,19 @@ public class JavaScriptTestingParallelWorkStealing {
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
 						// Comment out this line for scailability test
-						this.queue.timeout();
+						//this.queue.timeout();
 					} finally {
 						// Comment out this line for scailability test
-						this.queue.done();
+						//this.queue.done();
 					}	
 				}
 			}
-
+			
 	        //Close the browser
 			print("Quiting driver at end of tasks.");
 	        driver.quit();
 	    }
-
+		
 		public String execToString(String command) throws Exception {
 		    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		    CommandLine commandline = CommandLine.parse(command);
@@ -570,45 +548,45 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 	}
 
-
+	
 	public static void main(String[] args) {
-		String input1 = "resources/input-filtered-30.csv";
-		//String input1 = "resources/input-baidu.csv";
-		String javaScript1 = "resources/getXpaths.js";
-		String output1 = "resources/xpaths-2.csv";
+		//String input1 = "resources/tables/input-filtered-30.csv";
+		String input1 = "resources/tables/input1-small.csv";
+		String javaScript1 = "resources/programs/getXpaths.js";
+		String output1 = "resources/tables/pldi-xpaths-2.csv";
 
-		String input2 = "resources/xpaths-2.csv";
-		String javaScript2 = "resources/filter.js";
-		String output2 = "resources/filteredXpaths-2.csv";
+		String input2 = "resources/tables/pldi-xpaths-2.csv";
+		String javaScript2 = "resources/programs/filter.js";
+		String output2 = "resources/tables/pldi-filteredXpaths-2.csv";
 
-		String input3 = "resources/filteredXpaths-2.csv";
-		String javaScript3 = "resources/nodeSaving.js";
-		String output3 = "resources/savedNodes-2.csv";
+		String input3 = "resources/tables/pldi-filteredXpaths-2.csv";
+		String javaScript3 = "resources/programs/pldi-nodeSaving.js";
+		String output3 = "resources/tables/pldi-savedNodes-2.csv";
+		
+		String input4 = "resources/tables/pldi-savedNodes-2.csv";
+		String javaScript4 = "resources/programs/pldi-nodeRetrieving.js";
+		String output4 = "resources/tables/pldi-nodeRetrieval1-SameSession-2.csv";
 
-		String input4 = "resources/savedNodes-2.csv";
-		String javaScript4 = "resources/nodeRetrieving.js";
-		String output4 = "resources/nodeRetrieval1-SameSession-2.csv";
-
-		String output5 = "resources/nodeRetrieval2-DiffSessionButTemporallyClose-2.csv";
-
-		String output6 = "resources/nodeRetrieval3-DiffSessionAndTemporallyFar-2.csv";
-
-
+		String output5 = "resources/tables/pldi-nodeRetrieval2-DiffSessionButTemporallyClose-2.csv";
+		
+		String output6 = "resources/tables/pldi-nodeRetrieval3-DiffSessionAndTemporallyFar-2.csv";
+		
+		
 		Boolean jquery = false;
 		int threads = 8;
-
+		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
-
+		
 		Boolean firstSession = true;
-
+		
 		if (firstSession){
 			system.startSession();
 			system.stage(input1,javaScript1,output1,jquery,threads);
 			system.stage(input2,javaScript2,output2,jquery,threads);
 			system.stage(input3,javaScript3,output3,jquery,threads);
-			system.stage(input4,javaScript4,output4,jquery,threads);
+			//system.stage(input4,javaScript4,output4,jquery,threads);
 			system.endSession();
-
+			
 			system.startSession();
 			system.stage(input4,javaScript4,output5,jquery,threads);
 			system.endSession();
@@ -618,7 +596,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			system.stage(input4,javaScript4,output6,jquery,threads);
 			system.endSession();
 		}
-
+		        
 
 	}
 
