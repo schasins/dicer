@@ -53,7 +53,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
 	//String path_to_proxyserver = "~/research/cacheall-proxy-server/";
-	String path_to_proxyserver = "/home/eecs/schasins/research/cacheall-proxy-server";
+	String path_to_proxyserver = "/home/eecs/schasins/research/cacheall-proxy-server/";
 
 	// Number of done jobs
 	static int finishedJobs;
@@ -174,7 +174,6 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		System.out.println("Starting session.");
-		/*
 		try {
 			String[] shCommand = {"/bin/sh", "-c", "mkdir " + path_to_proxyserver + ".cache"}; 
 			System.out.println(shCommand[2]);
@@ -185,7 +184,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 
 		/*try {
 			String command = "python proxyserv.py -c -i "+String.valueOf(System.currentTimeMillis());
@@ -201,7 +200,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		System.out.println("Ending session.");
 		Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
-		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + "/.cache " + path_to_proxyserver +"/caches/" + cache_dir}; 
+		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver +"caches/" + cache_dir}; 
 		try {
 			Process p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
@@ -501,7 +500,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 		
 	    public void run() {
-			String PROXY = "localhost:1235";
+			String PROXY = "localhost:1234";
 			org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
 			proxy.setHttpProxy(PROXY).setNoProxy("https:*");
 			DesiredCapabilities cap = new DesiredCapabilities();
