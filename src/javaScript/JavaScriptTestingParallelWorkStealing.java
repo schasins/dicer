@@ -52,7 +52,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
-	String path_to_proxyserver = "~/Documents/cacheall-proxy-server/";
+	//String path_to_proxyserver = "~/research/cacheall-proxy-server/";
+	String path_to_proxyserver = "/home/eecs/schasins/research/cacheall-proxy-server";
 
 	// Number of done jobs
 	static int finishedJobs;
@@ -198,9 +199,9 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void endSession(){
 		System.out.println("Ending session.");
-		/*Date date = new Date();
+		Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
-		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver + cache_dir}; 
+		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + "/.cache " + path_to_proxyserver +"/caches/" + cache_dir}; 
 		try {
 			Process p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
@@ -208,7 +209,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 	}
 	
 	private class TaskQueue {
@@ -321,9 +322,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(110, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(110, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(110, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(250, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(250, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(250, TimeUnit.SECONDS);
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -519,7 +520,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 105, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 245, TimeUnit.SECONDS, false);
 
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");

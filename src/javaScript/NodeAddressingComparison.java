@@ -6,9 +6,9 @@ import java.util.Date;
 public class NodeAddressingComparison {
 
 	public static void main(String[] args) {
-		String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
+		//String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
 		//String input1 = "resources/tables/nodeAddressingComparison/urls-30.csv";
-		//String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
+		String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
 		String javaScript1 = "resources/programs/nodeAddressingComparison/getXpaths.js";
 		String output1 = "resources/tables/nodeAddressingComparison/stage1-xpaths.csv";
 
@@ -26,11 +26,11 @@ public class NodeAddressingComparison {
 		String output5Start = "resources/tables/nodeAddressingComparison/stage5-nodeChangeTracking";
 		
 		Boolean jquery = true;
-		int threads = 8;
+		int threads = 32;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = false;
+		Boolean firstSession = true;
 		
 		if (firstSession){
 			system.startSession();
