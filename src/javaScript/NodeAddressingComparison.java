@@ -30,7 +30,7 @@ public class NodeAddressingComparison {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = true;
+		Boolean firstSession = false;
 		
 		if (firstSession){
 			system.startSession();
@@ -40,7 +40,7 @@ public class NodeAddressingComparison {
 			system.endSession();
 		}
 		//run a test even if we're doing training, so we have a test very shortly after training
-		String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+		String date = new SimpleDateFormat("dd-MM-yyyy-hh-mm").format(new Date());
 		String output4 = output4Start+"_"+date+".csv";
 		String output5 = output5Start+"_"+date+".csv";
 		system.startSession();

@@ -252,16 +252,20 @@ var saveTargetInfoForIMacros = function(target){
 //ATA-QV
 
 var saveTargetInfoForATAQV = function(target){
-	//console.log("saveTargetInfoForATAQV");
+	//////console.log("saveTargetInfoForATAQV");
     var label = getLabel(target);
-    //console.log("label", label);
+    //////console.log("label", label);
 
     var nodes = getnodesWithLabelInSubtree(label,$("html"));
+    //console.log("*******************");
+    //console.log(nodes);
+    //console.log("*******************");
+
     if (nodes.length === 1){
-    	//console.log("just one node with this label!");
+    	//////console.log("just one node with this label!");
     	return JSON.stringify({"l":label,"a":[]});
     }
-    //console.log(nodes.length, "nodes with this label");
+    //////console.log(nodes.length, "nodes with this label");
     
     //must find anchors
 
@@ -272,7 +276,11 @@ var saveTargetInfoForATAQV = function(target){
     	if(nodes[i] === target){
     		//console.log("Good, we found the original node using our label.");
     	}
-    	t_others.push(subtreeThatHasNodeLacksNode(nodes[i],target));
+    	else{
+    		var new_t_other = subtreeThatHasNodeLacksNode(nodes[i],target);
+    		t_others.push(new_t_other);
+    		//console.log("new t_other", new_t_other, "for nodes[i]", nodes[i]);
+    	}
     }
     
     var anchors = [];
@@ -294,9 +302,9 @@ var saveTargetInfoForATAQV = function(target){
     		//console.log("t_cl", t_cl);
     		return JSON.stringify({"l":label,"a":null});
     	}
-    	//console.log("found a distinguishing label for t_cl", distinguishing_label);
-    	//console.log("t_i", t_i);
-    	//console.log("t_cl", t_cl);
+    	//////console.log("found a distinguishing label for t_cl", distinguishing_label);
+    	//////console.log("t_i", t_i);
+    	//////console.log("t_cl", t_cl);
     	anchors.push(distinguishing_label);
     	
     	t_i = dict.parent;
@@ -313,7 +321,7 @@ var saveTargetInfoForATAQV = function(target){
 	    	}
 	    }
 	    t_others = new_t_others;
-	    //console.log("new_t_others", new_t_others);
+	    //////console.log("new_t_others", new_t_others);
     	
     }
     
@@ -322,7 +330,7 @@ var saveTargetInfoForATAQV = function(target){
 };
 
 var findClosestSubtrees = function(t_i, t_others){
-	//console.log("findClosestSubtrees");
+	//////console.log("findClosestSubtrees");
 	var currentNode = t_i;
 	while(true){
 		var parent = currentNode.parent();
@@ -345,7 +353,7 @@ var findClosestSubtrees = function(t_i, t_others){
 };
 
 var getDistinguishingLabel = function(t_i,t_others){
-	//console.log(getDistinguishingLabel);
+	//////console.log(getDistinguishingLabel);
 	var nodes = $.makeArray(t_i.find("*"));
 	nodes.push(t_i.get(0));
 	var candidates = [];
@@ -353,19 +361,23 @@ var getDistinguishingLabel = function(t_i,t_others){
 		////console.log("nodes[i]", nodes[i]);
 		candidates.push(getLabel(nodes[i]));
 	}
+	//console.log("candidates", candidates);
 	
 	labels_to_avoid = [];
-	//console.log("t_others", t_others);
+	//////console.log("t_others", t_others);
 	for (var i = 0; i<t_others.length; i++){
-		////console.log(t_others[i]);
+		////////console.log(t_others[i]);
 		var bad_nodes = $.makeArray($(t_others[i]).find("*"));
-		bad_nodes.push(t_others[i]);
-		////console.log("bad_nodes", bad_nodes);
+		////console.log(t_others);
+		if (t_others[i].get){bad_nodes.push(t_others[i].get(0));} else {bad_nodes.push(t_others[i]);}
+		////////console.log("bad_nodes", bad_nodes);
 		for (var j = 0; j<bad_nodes.length; j++){
 			////console.log("bad_nodes[j]", bad_nodes[j]);
-			labels_to_avoid.push(getLabel(bad_nodes[j]));
+			var lta = getLabel(bad_nodes[j]);
+			labels_to_avoid.push(lta);
 		}
 	}
+	//console.log("labels_to_avoid", labels_to_avoid);
 	
 	filtered_candidates = [];
 	for (var i = 0; i<candidates.length; i++){
@@ -387,18 +399,18 @@ var getDistinguishingLabel = function(t_i,t_others){
 
 
 var subtreeThatHasNodeLacksNode = function(node1,node2){
-	//console.log("subtreeThatHasNodeLacksNode");
+	//////console.log("subtreeThatHasNodeLacksNode");
     var currentSubtree = $(node1);
     var $node2 = $(node2)
     counter = 0;
 	while(counter < 50 && true){
 		counter ++;
 		var parent = currentSubtree.parent();
-		//console.log("parent in subtreeThatHasNodeLacksNode", parent);
+		//////console.log("parent in subtreeThatHasNodeLacksNode", parent);
 		var descendants = parent.find("*");
 		for (var i = 0; i< descendants.length ; i++){
 			if ($node2.is(descendants[i])){
-				//console.log("Good, we found the other label.");
+				//////console.log("Good, we found the other label.");
 				return currentSubtree;
 			}
 		}
@@ -408,7 +420,7 @@ var subtreeThatHasNodeLacksNode = function(node1,node2){
 
 var subtreeThatLacksOtherInstancesOfNodeLabel = function(node){
 	var $body = $("body");
-	//console.log("subtreeThatLacksOtherInstancesOfNodeLabel");
+	////console.log("subtreeThatLacksOtherInstancesOfNodeLabel");
 	var l = getLabel(node);
 	var currentSubtree = $(node);
 	counter = 0;
@@ -418,10 +430,11 @@ var subtreeThatLacksOtherInstancesOfNodeLabel = function(node){
 		if (parent.is($body)){
 			return parent;
 		}
-		//console.log("parent in subtreeThatLacksOtherInstancesOfNodeLabel", parent);
+		//////console.log("parent in subtreeThatLacksOtherInstancesOfNodeLabel", parent);
 		var descendants = parent.find("*");
 		var l_count = 0;
 		for (var i = 0; i<descendants.length; i++){
+			////console.log("descendants[i]");
 			if (getLabel(descendants[i])===l){
 				l_count += 1;
 				if (l_count > 1){
@@ -434,49 +447,51 @@ var subtreeThatLacksOtherInstancesOfNodeLabel = function(node){
 };
 
 var getLabel = function(node){
-    var label = "";
-    label = node.textContent;
-    if (label === "" || label === undefined){
-    	label = node.nodeName+"*****nodeName";
-    }
-    else{
-    	label = label+"*****textContent";
+	////console.log(node);
+    var numChildren = node.childNodes.length;
+    var label = node.nodeName+"*****nodeName";
+    //if no children, we can use the text content...
+    if (numChildren === 1 && node.childNodes[0].nodeName === "#text"){
+	    var text = node.textContent;
+	    if (text !== "" && text !== undefined){
+	    	label = text+"*****textContent";
+	    }
     }
     return label;
 };
 
 var getnodesWithLabelInSubtree = function(label,root){
-	//console.log("getnodesWithLabelInSubtree");
+	//////console.log("getnodesWithLabelInSubtree");
 	var ls = [];
 	var arr = label.split("*****");
 	var finder = arr[0];
 	var tp = arr[1];
-	//console.log("finder", finder);
+	//////console.log("finder", finder);
 	if (tp === "nodeName"){
-		//console.log("using nodeName");
+		//////console.log("using nodeName");
 		ls = root.find(finder);
-		//console.log(ls);
+		//////console.log(ls);
 	}
 	else{
-		//console.log("using textContent");
+		//////console.log("using textContent");
 		var nodes = root.find("*");
         nodes.push(root); //also include the root itself
     	for (var i = 0; i< nodes.length; i++){
-    		if (nodes[i].textContent === finder){
+    		if (getLabel(nodes[i]) === label){
     			ls.push(nodes[i]);
     		}
     	}
 	}
-	//console.log("ls", ls);
+	//////console.log("ls", ls);
 	return ls;
 };
 
 var getTargetForATAQV = function(targetInfo){
-	//console.log("getTargetForATAQV");
-	//console.log(targetInfo);
+	//////console.log("getTargetForATAQV");
+	//////console.log(targetInfo);
 	var label = targetInfo.l;
 	var anchors = targetInfo.a;
-	//console.log("anchors", anchors);
+	//////console.log("anchors", anchors);
 	var currentNode = $("html");
 	while(true){
 	
@@ -493,11 +508,12 @@ var getTargetForATAQV = function(targetInfo){
 		var foundChild = false;
 		for (var i = 0; i<children.length; i++){
 			var child = children[i];
-			//console.log(child);
+			//////console.log(child);
 			var descendants = $(child).find("*");
 			descendants.push(child);
 			var labels = [];
 			for (var j = 0; j<descendants.length; j++){
+				////console.log("descendants[j]");
 				var l1 = getLabel(descendants[j]);
 				labels.push(l1);
 			}
@@ -507,10 +523,10 @@ var getTargetForATAQV = function(targetInfo){
 			}
 			var useThisChild = true;
 			for (var j = 0; j< anchors.length; j++){
-				//console.log("anchor", anchors[j], labels.indexOf(anchors[j]));
+				//////console.log("anchor", anchors[j], labels.indexOf(anchors[j]));
 				if (labels.indexOf(anchors[j]) === -1){
 					//this subtree doesn't have all anchors
-					//console.log("Couldn't find this anchor, better move to the next child");
+					//////console.log("Couldn't find this anchor, better move to the next child");
 					useThisChild = false;
 					break;
 				}
@@ -520,7 +536,7 @@ var getTargetForATAQV = function(targetInfo){
 			}
 			//if we've made it here, the subtree has all anchors, go down till no one child has all of them
 			currentNode = $(child);
-			//console.log("found a child with all", child);
+			//////console.log("found a child with all", child);
 			foundChild = true;
 			break;
 		}
@@ -534,11 +550,15 @@ var getTargetForATAQV = function(targetInfo){
 				}
 				return null;
 			}
-			//console.log("couldn't find a child with all, throw out anchor", anchors[anchors.length-1]);
+			//////console.log("couldn't find a child with all, throw out anchor", anchors[anchors.length-1]);
 			anchors = anchors.slice(0,anchors.length-1);
 		}
 	}
 };
+
+
+//$("*").click(function(node){var lab = saveTargetInfoForATAQV(node.target); //console.log(lab); //console.log(getTargetForATAQV(JSON.parse(lab)));});
+
 
 
 /******* XPATH TO NODE code *********/

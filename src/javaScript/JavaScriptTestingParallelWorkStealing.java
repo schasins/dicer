@@ -315,15 +315,15 @@ public class JavaScriptTestingParallelWorkStealing {
 			try{
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
-	        profile.setPreference("dom.max_script_run_time", 300);
-	        profile.setPreference("dom.max_chrome_script_run_time", 300);
+	        profile.setPreference("dom.max_script_run_time", 500);
+	        profile.setPreference("dom.max_chrome_script_run_time", 500);
 	            
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(250, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(250, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(250, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(400, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(400, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(400, TimeUnit.SECONDS);
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -519,7 +519,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 245, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 395, TimeUnit.SECONDS, false);
 
 					if (!driverOK){
 						print("Replacing driver after !driverOK.");
