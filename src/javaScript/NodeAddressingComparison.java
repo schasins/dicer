@@ -45,7 +45,7 @@ public class NodeAddressingComparison {
 		String output5 = output5Start+"_"+date+".csv";
 		system.startSession();
 		system.stage(output3,javaScript4,output4,jquery,threads);
-		system.stage(output4,javaScript5,output5,jquery,threads);
+		//system.stage(output4,javaScript5,output5,jquery,threads);
 		system.endSession();
 	}
 

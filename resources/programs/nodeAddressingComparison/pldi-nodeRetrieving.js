@@ -5,8 +5,6 @@ var getTargetId;
 var getTargetClass;
 var xPathToNode;
 
-(function() {
-
         // convert an xpath expression to an array of DOM nodes
 	function xPathToNodes(xpath) {
 	  try {
@@ -238,8 +236,6 @@ var xPathToNode;
     id: getTargetId,
     search: getTargetSearch
   }
-
-})()
 
 function getAllCandidates(){
   return document.getElementsByTagName("*");
@@ -756,6 +752,80 @@ var func_f1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 };
 
 var func_f2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+    
+//the new similarity based paper algorithm, the version that filters on text first
+
+var func_g1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetSimple(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_g2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_h1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetSuffix(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_h2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_i1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetText(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_i2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_j1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetClass(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_j2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_k1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetId(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_k2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_l1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(targetInfoString);
+	var target = getTargetSearch(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_l2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var url3 = window.location.href;
 	return url3;
 };
