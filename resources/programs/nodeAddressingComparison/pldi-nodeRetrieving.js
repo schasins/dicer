@@ -756,13 +756,13 @@ var func_f2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 	return url3;
 };
     
-//the new similarity based paper algorithm, the version that filters on text first
+//the various voting subalgorithms
 
 var func_g1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSimple(targetInfo);
-	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
-	simulateClick(target);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
 var func_g2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
@@ -773,8 +773,8 @@ var func_g2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 var func_h1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSuffix(targetInfo);
-	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
-	simulateClick(target);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
 var func_h2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
@@ -785,8 +785,8 @@ var func_h2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 var func_i1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetText(targetInfo);
-	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
-	simulateClick(target);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
 var func_i2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
@@ -797,8 +797,8 @@ var func_i2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 var func_j1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetClass(targetInfo);
-	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
-	simulateClick(target);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
 var func_j2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
@@ -809,8 +809,8 @@ var func_j2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 var func_k1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetId(targetInfo);
-	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
-	simulateClick(target);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
 var func_k2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
@@ -821,8 +821,8 @@ var func_k2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 var func_l1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSearch(targetInfo);
-	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
-	simulateClick(target);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
 var func_l2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
