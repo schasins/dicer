@@ -30,7 +30,7 @@ public class NodeAddressingComparison {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = true;
+		Boolean firstSession = false;
 		
 		if (firstSession){
 			system.startSession();
