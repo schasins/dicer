@@ -315,15 +315,15 @@ public class JavaScriptTestingParallelWorkStealing {
 			try{
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
-	        profile.setPreference("dom.max_script_run_time", 250);
-	        profile.setPreference("dom.max_chrome_script_run_time", 250);
+	        profile.setPreference("dom.max_script_run_time", 450);
+	        profile.setPreference("dom.max_chrome_script_run_time", 450);
 	            
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(200, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(200, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(200, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(400, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(400, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(400, TimeUnit.SECONDS);
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -426,9 +426,10 @@ public class JavaScriptTestingParallelWorkStealing {
 			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
 
 	        List<String> ansList = new ArrayList<String>();
-	        
+	        int failureAlg = -1;
 	        try{
 		        for (int j = 0; j<this.algorithms; j++){
+		        	failureAlg = j;
 			        //reload for each algorithm
 		        	loadPage(driver,url);
 
@@ -472,6 +473,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		        }
 	        }
 			catch(WebDriverException e){
+				System.out.println("Failure alg: " + failureAlg);
 				System.out.println(url + ": " + e.toString());
 				/*
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
@@ -519,9 +521,10 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 195, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 395, TimeUnit.SECONDS, false);
 
 					if (!driverOK){
+						print("!driverOK on row: "+row.toString());
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
 						print(driver.toString());
@@ -529,6 +532,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						//this.queue.timeout();
 					}
 				    } catch (Exception e) {
+						print("exception on row: "+row.toString());
 						print(row[0] + ": " + e.toString().split("\n")[0]);
 						print("Replacing driver after exception.");
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
