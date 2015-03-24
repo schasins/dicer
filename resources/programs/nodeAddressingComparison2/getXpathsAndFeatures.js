@@ -65,7 +65,7 @@ function walkTheDOM(node, xpath) {
 	var skip = false;
 	for(var i = 0; i< all_features.length; i++){
 		var value = features[all_features[i]];
-		if (value.indexOf("<,>") > -1 || value.indexOf("@#@") > -1){
+		if (value && (value.indexOf("<,>") > -1 || value.indexOf("@#@") > -1)){
 			skip = true; //no row for this one
 			break;
 		}
