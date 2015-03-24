@@ -85,7 +85,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
-			CSVReader reader = new CSVReader(new FileReader(inputFile),',','\'','\0');
+			//CSVReader reader = new CSVReader(new FileReader(inputFile),',','\'','\0');
+			CSVReader reader = new CSVReader(new FileReader(inputFile),',','\'','\\');
 		    rows = reader.readAll();
 		}
 		catch(Exception e){
@@ -134,7 +135,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		//Output
 		CSVWriter writer;
 		try{
-			writer = new CSVWriter(new FileWriter(outputFile),',','\'','\0');
+			writer = new CSVWriter(new FileWriter(outputFile),',','\'','\\');
+			//writer = new CSVWriter(new FileWriter(outputFile),',','\'','\0');
 		}
 		catch(Exception e){
 			System.out.println("Failed to open output file.");
