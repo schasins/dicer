@@ -1,3 +1,36 @@
+/******* XPATH TO NODE code *********/
+
+    // convert an xpath expression to an array of DOM nodes
+	function xPathToNodes(xpath) {
+	  try {
+	    var q = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE,
+		                      null);
+	    var results = [];
+
+	    var next = q.iterateNext();
+	    while (next) {
+	      results.push(next);
+	      next = q.iterateNext();
+	    }
+	    return results;
+	  } catch (e) {
+	    return null;
+	  }
+	  return [];
+	}
+
+	function xPathToNode(xpath) {
+	  var nodes = xPathToNodes(xpath);
+	  //if we don't successfully find nodes, let's alert
+	  if (nodes.length != 1)
+	    return null;
+
+	  if (nodes.length >= 1)
+	    return nodes[0];
+	  else
+	    return null;
+	}
+
 function nodeToXPath(element) {
 	//  we want the full path, not one that uses the id since ids can change
 	//  if (element.id !== '')
