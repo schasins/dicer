@@ -166,7 +166,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		long stop = System.currentTimeMillis();
 		String[] times = new String[1];
 		times[0] = String.valueOf((stop-start)/1000);
-		this.writer.writeNext(times);
+		//this.writer.writeNext(times);
 		
 		//Close output writer
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
