@@ -67,7 +67,7 @@ var func_a1 = function(url,xpath,url1,url2){
 	}
 
 	if (!skip){
-	    return url+"<,>"+xpath+"<,>"+url1+"<,>"+url2+feature_string);
+	    return url+"<,>"+xpath+"<,>"+url1+"<,>"+url2+feature_string;
     }
     return;
 };
