@@ -49,5 +49,12 @@ var func_a1 = function(urlArg,xpath,url1){
 
 var func_a2 = function(urlArg,xpath,url1){
 	var url2 = window.location.href;
-	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2;
+	var feature_str = "";
+	for (var i = 0; i< arguments.length; i++){
+		if (i > 2){
+			feature_str+="<,>"+arguments[i];
+		}
+	}
+	var str_output = urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+feature_str;
+	return str_output;
 };
