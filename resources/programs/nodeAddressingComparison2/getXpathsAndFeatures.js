@@ -62,16 +62,24 @@ function walkTheDOM(node, xpath) {
 
 	var features = getFeatures(node);
 	var feature_string = "";
+	var skip = false;
 	for(var i = 0; i< all_features.length; i++){
-		feature_string+="<,>"+features[all_features[i]];
+		var value = features[all_features[i]];
+		if (value.indexOf("<,>") > -1 || value.indexOf("@#@") > -1){
+			skip = true; //no row for this one
+			break;
+		}
+		feature_string+="<,>"+value;
 	}
 
-    if (!first){
-    	output+=("@#@"+url+"<,>"+xpath+"<,>"+actualUrl+feature_string);
-    	}
-    else {
-       first = false;
-       output+=(url+"<,>"+xpath+"<,>"+actualUrl+feature_string);
+	if (!skip){
+	    if (!first){
+	    	output+=("@#@"+url+"<,>"+xpath+"<,>"+actualUrl+feature_string);
+	    	}
+	    else {
+	       first = false;
+	       output+=(url+"<,>"+xpath+"<,>"+actualUrl+feature_string);
+	    }
     }
     
     node = node.firstChild;
