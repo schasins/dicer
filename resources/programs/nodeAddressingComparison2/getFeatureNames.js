@@ -38,6 +38,9 @@ function getFeatures(element){
 	  if (val !== null && typeof val === 'object'){
 	    val = val.toString();
 	  }
+    else if (typeof val === 'function'){
+      continue;
+    }
 	  info[prop] = val;
   } //test
 
