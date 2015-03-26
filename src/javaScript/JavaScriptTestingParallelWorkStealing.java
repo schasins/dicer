@@ -45,6 +45,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
+	int secondsLimit = 30;
 	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
@@ -63,6 +64,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		this.DOMChange = 0;
 	}
 	
+	/*
 	JavaScriptTestingParallelWorkStealing(int DOMChange) {
 		stages = 0;
 		this.DOMChange = DOMChange;
@@ -74,13 +76,16 @@ public class JavaScriptTestingParallelWorkStealing {
 			System.exit(1);
 		}
 	}
+	*/
 	
-	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads){
+	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit){
 		this.stages ++;
 		System.out.println("STAGE "+this.stages);
 		
 		this.algorithms = 0;
 		this.subalgorithms = new ArrayList<Integer>();
+		
+		this.secondsLimit = secondsLimit;
 		
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
@@ -154,7 +159,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, i);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, this.secondsLimit, i);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -277,15 +282,17 @@ public class JavaScriptTestingParallelWorkStealing {
 		CSVWriter writer;
 		Boolean jquery;
 		Boolean verbose = true;
+		int secondsLimit;
 		int index;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int i){
+		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int secondsLimit, int i){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
 			this.algorithms = algorithms;
 			this.subalgorithms = subalgorithms;
 			this.jquery = jquery;
+			this.secondsLimit = secondsLimit;
 			this.index = i;
 		}
 		
@@ -317,15 +324,15 @@ public class JavaScriptTestingParallelWorkStealing {
 			try{
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
-	        profile.setPreference("dom.max_script_run_time", 450);
-	        profile.setPreference("dom.max_chrome_script_run_time", 450);
+	        profile.setPreference("dom.max_script_run_time", this.secondsLimit+50);
+	        profile.setPreference("dom.max_chrome_script_run_time", this.secondsLimit+50);
 	            
 			//WebDriver driver = new FirefoxDriver(cap);
 			//WebDriver driver = new FirefoxDriver();
 	        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
-			driver.manage().timeouts().implicitlyWait(400, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(400, TimeUnit.SECONDS);
-			driver.manage().timeouts().setScriptTimeout(400, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(this.secondsLimit+5, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(this.secondsLimit+5, TimeUnit.SECONDS);
+			driver.manage().timeouts().setScriptTimeout(this.secondsLimit+5, TimeUnit.SECONDS);
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -523,7 +530,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), 395, TimeUnit.SECONDS, false);
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), this.secondsLimit, TimeUnit.SECONDS, false);
 
 					if (!driverOK){
 						print("!driverOK on row: "+row.toString());
@@ -598,19 +605,19 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		if (firstSession){
 			system.startSession();
-			system.stage(input1,javaScript1,output1,jquery,threads);
-			system.stage(input2,javaScript2,output2,jquery,threads);
-			system.stage(input3,javaScript3,output3,jquery,threads);
+			system.stage(input1,javaScript1,output1,jquery,threads,30);
+			system.stage(input2,javaScript2,output2,jquery,threads,30);
+			system.stage(input3,javaScript3,output3,jquery,threads,30);
 			//system.stage(input4,javaScript4,output4,jquery,threads);
 			system.endSession();
 			
 			system.startSession();
-			system.stage(input4,javaScript4,output5,jquery,threads);
+			system.stage(input4,javaScript4,output5,jquery,threads,30);
 			system.endSession();
 		}
 		else{
 			system.startSession();
-			system.stage(input4,javaScript4,output6,jquery,threads);
+			system.stage(input4,javaScript4,output6,jquery,threads,30);
 			system.endSession();
 		}
 		        
