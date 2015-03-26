@@ -21,7 +21,7 @@ public class NodeAddressingFeatureCollection {
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
 		system.startSession();
-		system.stage(input1,javaScript1,output1,jquery,threads,40);
+		system.stage(input1,javaScript1,output1,jquery,threads,300);
 		system.endSession();
 	}
 
