@@ -115,7 +115,7 @@ var func_a1 = function(url,xpath,url1,url2){
 	var skip = false;
 	for(var i = 0; i< all_features.length; i++){
 		var value = features[all_features[i]];
-		if (value && (value.indexOf("<,>") > -1 || value.indexOf("@#@") > -1)){
+		if (value && typeof value === "string" && (value.indexOf("<,>") > -1 || value.indexOf("@#@") > -1)){
 			skip = true; //no row for this one
 			break;
 		}
