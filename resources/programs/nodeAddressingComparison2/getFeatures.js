@@ -59,14 +59,15 @@ function getFeatures(element){
   var info = {};
   info.xpath = nodeToXPath(element);
   for (var prop in element) {
-    if (element.hasOwnProperty(prop)) {
-      var val = element[prop];
-      if (val !== null && typeof val === 'object'){
-        val = val.toString();
-      }
-      info[prop] = val;
+	  var val = element[prop];
+	  if (val !== null && typeof val === 'object'){
+	    val = val.toString();
+	  }
+    else if (typeof val === 'function'){
+      continue;
     }
-  }
+	  info[prop] = val;
+  } //test
 
   var text = element.textContent;
   info.textContent = text;
