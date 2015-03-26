@@ -33,7 +33,6 @@ function getFeatures(element){
   var info = {};
   info.xpath = nodeToXPath(element);
   for (var prop in element) {
-      console.log(prop);
 	  var val = element[prop];
 	  if (val !== null && typeof val === 'object'){
 	    val = val.toString();
