@@ -27,9 +27,9 @@ public class NodeAddressingComparison2 {
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
 		system.startSession();
-		system.stage(input1,javaScript1,output1,jquery,threads,20);
+		system.stage(input1,javaScript1,output1,jquery,threads,30);
 		system.stage(output1,javaScript2,output2,jquery,threads,80);
-		system.stage(output2,javaScript3,output3,jquery,threads,30);
+		system.stage(output2,javaScript3,output3,jquery,threads,50);
 		system.endSession();
 	}
 
