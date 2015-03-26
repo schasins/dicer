@@ -35,7 +35,12 @@ function getFeatures(element){
   for (var prop in element) {
 	  var val = element[prop];
 	  if (val !== null && typeof val === 'object'){
-	    val = val.toString();
+      try{
+        val = val.toString(); //sometimes get that toString not allowed
+      }
+      catch(err){
+        continue;
+      }
 	  }
     else if (typeof val === 'function'){
       continue;
