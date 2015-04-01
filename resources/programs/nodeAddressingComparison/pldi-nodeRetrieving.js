@@ -313,6 +313,31 @@ function nodeToXPath(element) {
     return bestNode;
   };
   
+  var regressionModel = {};
+  var regressionIntercept = ;
+  
+  getTargetForSimilarityRegression = function(targetInfo) {
+    var candidates = getAllCandidates();
+    var bestScore = -10000000000000000000000000;
+    var bestNode = null;
+    for (var i = 0; i<candidates.length; i++){
+	var info = getFeatures(candidates[i]);
+	var score = regressionIntercept;
+	for (var prop in targetInfo) {
+	  if (targetInfo.hasOwnProperty(prop)) {
+	    if (targetInfo[prop] === info[prop] && (prop in regressionModel)){
+              score += regressionModel[prop]; //just 1s and 0s so no need to actually multiply
+	    }
+	  }
+	}
+	if (score > bestScore){
+	  bestScore = score;
+	  bestNode = candidates[i];
+	}
+    }
+    return bestNode;
+  };
+  
   getTargetForSimilarityFiltered = function(targetInfo) {
     var unfilteredCandidates = getAllCandidates();
     var targetText = targetInfo.textContent;
@@ -826,6 +851,32 @@ var func_l1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoStr
 };
 
 var func_l2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+//the new similarity algorithms that use training on data collected at design time
+
+var func_m1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(similarityInfoString);
+	var target = getTargetForSimilarityRegression(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_m2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_n1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var targetInfo = JSON.parse(similarityInfoString);
+	var target = getTargetForSimilaritySVM(targetInfo);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_n2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var url3 = window.location.href;
 	return url3;
 };
