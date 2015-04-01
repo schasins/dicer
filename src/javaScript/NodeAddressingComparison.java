@@ -6,9 +6,9 @@ import java.util.Date;
 public class NodeAddressingComparison {
 
 	public static void main(String[] args) {
-		String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
+		//String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
 		//String input1 = "resources/tables/nodeAddressingComparison/urls-30.csv";
-		//String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
+		String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
 		String javaScript1 = "resources/programs/nodeAddressingComparison/getXpaths.js";
 		String output1 = "resources/tables/nodeAddressingComparison/stage1-xpaths.csv";
 
@@ -22,15 +22,15 @@ public class NodeAddressingComparison {
 		String javaScript4 = "resources/programs/nodeAddressingComparison/pldi-nodeRetrieving.js";
 		String output4Start = "resources/tables/nodeAddressingComparison/stage4-nodeRetrieval";
 
-		String javaScript5 = "resources/programs/nodeAddressingComparison/pldi-nodeChangeTracking.js";
-		String output5Start = "resources/tables/nodeAddressingComparison/stage5-nodeChangeTracking";
+		String javaScript5 = "resources/programs/nodeAddressingComparison/pldi-similarityMetricDistance.js";
+		String output5Start = "resources/tables/nodeAddressingComparison/stage5-similarityMetricDistance";
 		
 		Boolean jquery = true;
 		int threads = 32;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = false;
+		Boolean firstSession = true;
 		
 		if (firstSession){
 			system.startSession();
@@ -45,7 +45,7 @@ public class NodeAddressingComparison {
 		String output5 = output5Start+"_"+date+".csv";
 		system.startSession();
 		system.stage(output3,javaScript4,output4,jquery,threads,300);
-		//system.stage(output4,javaScript5,output5,jquery,threads);
+		system.stage(output4,javaScript5,output5,jquery,threads,1200);
 		system.endSession();
 	}
 
