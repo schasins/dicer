@@ -300,7 +300,6 @@ var getTargetForSimilarityScores = [];
 
   getTargetForSimilarity = function(targetInfo) {
     var candidates = getAllCandidates();
-    var bestNode = null;
     for (var i = 0; i<candidates.length; i++){
 		var info = getFeatures(candidates[i]);
 		var similarityCount = 0;
@@ -312,13 +311,8 @@ var getTargetForSimilarityScores = [];
 		  }
 		}
 		getTargetForSimilarityScores.push(similarityCount);
-		if (similarityCount > bestScore){
-		  secondBestScore = bestScore;
-		  bestScore = similarityCount;
-		  bestNode = candidates[i];
-		}
     }
-    return bestNode;
+    return;
   };
   
   var getTargetForSimilarityFilteredScores = [];
@@ -338,8 +332,6 @@ var getTargetForSimilarityScores = [];
     }
     
     //otherwise, let's just run similarity on the nodes that have the same text
-    var bestScore = -1;
-    var bestNode = null;
     for (var i = 0; i<candidates.length; i++){
 	var info = getFeatures(candidates[i]);
 	var similarityCount = 0;
@@ -351,12 +343,8 @@ var getTargetForSimilarityScores = [];
 	  }
 	}
 	getTargetForSimilarityFilteredScores.push(similarityCount);
-	if (similarityCount > bestScore){
-	  bestScore = similarityCount;
-	  bestNode = candidates[i];
-	}
     }
-    return bestNode;
+    return;
   };
   
   
@@ -367,8 +355,6 @@ var getTargetForSimilarityScores = [];
   
   getTargetForSimilarityRegression = function(targetInfo) {
     var candidates = getAllCandidates();
-    var bestScore = -10000000000000000000000000;
-    var bestNode = null;
     for (var i = 0; i<candidates.length; i++){
 	var info = getFeatures(candidates[i]);
 	var score = regressionIntercept;
@@ -380,12 +366,8 @@ var getTargetForSimilarityScores = [];
 	  }
 	}
 	getTargetForSimilarityRegressionScores.push(score);
-	if (score > bestScore){
-	  bestScore = score;
-	  bestNode = candidates[i];
-	}
     }
-    return bestNode;
+    return;
   };
   
   
@@ -395,8 +377,6 @@ var getTargetForSimilarityScores = [];
   
   getTargetForSimilaritySVM = function(targetInfo) {
     var candidates = getAllCandidates();
-    var bestScore = -10000000000000000000000000;
-    var bestNode = null;
     for (var i = 0; i<candidates.length; i++){
 	var info = getFeatures(candidates[i]);
 	var score = 0;
@@ -408,12 +388,8 @@ var getTargetForSimilarityScores = [];
 	  }
 	}
 	getTargetForSimilaritySVMScores.push(score);
-	if (score > bestScore){
-	  bestScore = score;
-	  bestNode = candidates[i];
-	}
     }
-    return bestNode;
+    return;
   };
 
 //iMacros
