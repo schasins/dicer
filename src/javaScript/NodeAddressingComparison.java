@@ -6,9 +6,9 @@ import java.util.Date;
 public class NodeAddressingComparison {
 
 	public static void main(String[] args) {
-		//String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
+		String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
 		//String input1 = "resources/tables/nodeAddressingComparison/urls-30.csv";
-		String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
+		//String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
 		String javaScript1 = "resources/programs/nodeAddressingComparison/getXpaths.js";
 		String output1 = "resources/tables/nodeAddressingComparison/stage1-xpaths.csv";
 
@@ -30,22 +30,27 @@ public class NodeAddressingComparison {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = false;
+		Boolean firstSession = true;
 		
 		if (firstSession){
+			String date = new SimpleDateFormat("dd-MM-yyyy-hh-mm").format(new Date());
+			String output4 = output4Start+"_"+date+".csv";
+			String output5 = output5Start+"_"+date+".csv";
 			system.startSession();
 			system.stage(input1,javaScript1,output1,jquery,threads,50);
-			system.stage(output1,javaScript2,output2,jquery,threads,100);
+			system.stage(output1,javaScript2,output2,jquery,threads,90);
 			system.stage(output2,javaScript3,output3,jquery,threads,50);
+			system.stage(output3,javaScript4,output4,jquery,threads,300);
+			system.stage(output4,javaScript5,output5,jquery,threads,1200);
 			system.endSession();
 		}
 		//run a test even if we're doing training, so we have a test very shortly after training
 		String date = new SimpleDateFormat("dd-MM-yyyy-hh-mm").format(new Date());
-		String output4 = output4Start+"_"+date+".csv";
-		String output5 = output5Start+"_"+date+".csv";
+		String output42 = output4Start+"_"+date+".csv";
+		String output52 = output5Start+"_"+date+".csv";
 		system.startSession();
-		system.stage(output3,javaScript4,output4,jquery,threads,300);
-		system.stage(output4,javaScript5,output5,jquery,threads,1200);
+		system.stage(output3,javaScript4,output42,jquery,threads,300);
+		system.stage(output42,javaScript5,output52,jquery,threads,1200);
 		system.endSession();
 	}
 
