@@ -45,7 +45,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	CSVWriter writer;
 	Boolean jquery;
 	int stages;
-	int secondsLimit = 30;
+	int secondsLimit;
 	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
@@ -333,6 +333,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			driver.manage().timeouts().implicitlyWait(this.secondsLimit+5, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(this.secondsLimit+5, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(this.secondsLimit+5, TimeUnit.SECONDS);
+			print("secondsLimit: "+this.secondsLimit);
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -530,6 +531,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   TimeLimiter limiter = new SimpleTimeLimiter();
 				   
 				   try {
+					print("secondsLimit: "+this.secondsLimit);
 					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), this.secondsLimit, TimeUnit.SECONDS, false);
 
 					if (!driverOK){
