@@ -38,10 +38,10 @@ public class NodeAddressingComparison {
 			String output5 = output5Start+"_"+date+".csv";
 			system.startSession();
 			system.stage(input1,javaScript1,output1,false,threads,70);
-			system.stage(output1,javaScript2,output2,false,threads,140);
-			system.stage(output2,javaScript3,output3,true,threads,70);
-			system.stage(output3,javaScript4,output4,true,threads,350);
-			system.stage(output4,javaScript5,output5,false,threads,1500);
+			system.stage(output1,javaScript2,output2,false,threads,400);
+			system.stage(output2,javaScript3,output3,true,threads,400);
+			system.stage(output3,javaScript4,output4,true,threads,400);
+			system.stage(output4,javaScript5,output5,false,threads,1600);
 			system.endSession();
 		}
 		//run a test even if we're doing training, so we have a test very shortly after training
@@ -49,8 +49,8 @@ public class NodeAddressingComparison {
 		String output42 = output4Start+"_"+date+".csv";
 		String output52 = output5Start+"_"+date+".csv";
 		system.startSession();
-		system.stage(output3,javaScript4,output42,true,threads,350);
-		system.stage(output42,javaScript5,output52,false,threads,1500);
+		system.stage(output3,javaScript4,output42,true,threads,400);
+		system.stage(output42,javaScript5,output52,false,threads,1600);
 		system.endSession();
 	}
 
