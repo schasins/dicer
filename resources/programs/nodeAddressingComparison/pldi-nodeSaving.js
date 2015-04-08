@@ -628,7 +628,12 @@ function getFeatures(element){
   var info = {};
   info.xpath = nodeToXPath(element);
   for (var prop in element) {
-	  var val = element[prop];
+	  try{
+      var val = element[prop];
+      }
+    catch(err){
+      continue;
+    }
 	  if (val !== null && typeof val === 'object'){
 	      try{
 	        val = val.toString(); //sometimes get that toString not allowed
