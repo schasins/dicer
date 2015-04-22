@@ -717,7 +717,7 @@ function highlightNode(target, color) {
   var html = $target.html();
 }
 
-var func_a1 = function(urlArg,xpath,url1,url2,rowId){
+var func_a1 = function(urlArg,rowId,xpath,url1,url2){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
 	
