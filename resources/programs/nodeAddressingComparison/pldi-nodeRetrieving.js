@@ -843,48 +843,48 @@ var func_g1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetI
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSimple(targetInfo);
 	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	highlightNode(target[0],"#FF00FF");
+	return nodeToXPath(target[0]);
 };
 
 var func_h1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSuffix(targetInfo);
 	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	highlightNode(target[0],"#FF00FF");
+	return nodeToXPath(target[0]);
 };
 
 var func_i1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetText(targetInfo);
 	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	highlightNode(target[0],"#FF00FF");
+	return nodeToXPath(target[0]);
 };
 
 var func_j1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetClass(targetInfo);
 	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	highlightNode(target[0],"#FF00FF");
+	return nodeToXPath(target[0]);
 };
 
 var func_k1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetId(targetInfo);
 	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	highlightNode(target[0],"#FF00FF");
+	return nodeToXPath(target[0]);
 };
 
 var func_l1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSearch(targetInfo);
 	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	highlightNode(target[0],"#FF00FF");
+	return nodeToXPath(target[0]);
 };
 
 //the new similarity algorithms that use training on data collected at design time
