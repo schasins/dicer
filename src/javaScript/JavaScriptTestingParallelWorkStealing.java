@@ -452,7 +452,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        	cell = cell.replace("\"","\\\""); //escape double quotes
 	            row[j] = "\""+cell+"\"";
 	        }
-	        print("Making an argstring with rowId: "+rowId);
+	        //print("Making an argstring with rowId: "+rowId);
 			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length))+","+rowId;
 
 	        List<String> ansList = new ArrayList<String>();
