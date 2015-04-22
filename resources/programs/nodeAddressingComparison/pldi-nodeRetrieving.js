@@ -768,8 +768,6 @@ function highlightNode(target, color) {
   var offset = $target.offset();
   var boundingBox = target.getBoundingClientRect();
   var newDiv = $('<div/>');
-  var idName = 'ringer-hightlight-' + highlightCount;
-  newDiv.attr('id', idName);
   newDiv.css('width', boundingBox.width);
   newDiv.css('height', boundingBox.height);
   newDiv.css('top', offset.top);
