@@ -51,6 +51,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	String screenshotDir;
 	int stages;
 	int secondsLimit;
+	static int rowCounter;
 	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
@@ -162,8 +163,14 @@ public class JavaScriptTestingParallelWorkStealing {
 		this.execute(threads);
 	}
 	
+	public synchronized static int newRowId(){
+		rowCounter++;
+		return rowCounter;
+	}
+	
 	public void execute(int threads){
 		long start = System.currentTimeMillis();
+		this.rowCounter = 0;
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
@@ -284,7 +291,6 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	private static class RunTests implements Runnable {
 		TaskQueue queue;
-		int rowCounter;
 		String javaScriptFunction;
 		int algorithms;
 		List<Integer> subalgorithms;
@@ -298,7 +304,6 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int secondsLimit, Boolean screenshot, String screenshotDir, int i){
 			this.queue = queue;
-			this.rowCounter = 0;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
 			this.algorithms = algorithms;
@@ -308,11 +313,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.screenshot = screenshot;
 			this.screenshotDir = screenshotDir;
 			this.index = i;
-		}
-		
-		public synchronized int newRowId(){
-			this.rowCounter++;
-			return rowCounter;
 		}
 		
 		public void print(String s){
