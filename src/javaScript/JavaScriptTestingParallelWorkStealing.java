@@ -18,8 +18,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -44,6 +47,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	List<Integer> subalgorithms;
 	CSVWriter writer;
 	Boolean jquery;
+	Boolean screenshot;
+	String screenshotDir;
 	int stages;
 	int secondsLimit;
 	
@@ -54,7 +59,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	//String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
 	//String path_to_proxyserver = "/home/sarah/Dropbox/Berkeley/research/similarityAlgorithms/cacheall-proxy-server/";
 	//String path_to_proxyserver = "~/research/cacheall-proxy-server/";
-	String path_to_proxyserver = "/home/eecs/schasins/research/cacheall-proxy-server/";
+	//String path_to_proxyserver = "/home/eecs/schasins/research/cacheall-proxy-server/";
+	String path_to_proxyserver = "/scratch/schasins-cache/cacheall-proxy-server/";
 
 	// Number of done jobs
 	static int finishedJobs;
@@ -78,7 +84,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	*/
 	
-	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit){
+	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit, Boolean screenshot, String screenshotDir){
 		this.stages ++;
 		System.out.println("STAGE "+this.stages);
 		
@@ -150,6 +156,8 @@ public class JavaScriptTestingParallelWorkStealing {
 		this.writer = writer;
 		
 		this.jquery = jquery;
+		this.screenshot = screenshot;
+		this.screenshotDir = screenshotDir;
 		
 		this.execute(threads);
 	}
@@ -159,7 +167,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		ArrayList<Thread> threadList = new ArrayList<Thread>();
 		
 		for (int i = 0; i < threads; i++){
-			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, this.secondsLimit, i);
+			RunTests r = new RunTests(this.queue,this.javaScriptFunctions, this.algorithms, this.subalgorithms, this.writer, this.jquery, this.secondsLimit, this.screenshot, this.screenshotDir, i);
 	        Thread t = new Thread(r);
 	        threadList.add(t);
 	        t.start();
@@ -283,9 +291,11 @@ public class JavaScriptTestingParallelWorkStealing {
 		Boolean jquery;
 		Boolean verbose = true;
 		int secondsLimit;
+		Boolean screenshot;
+		String screenshotDir;
 		int index;
 		
-		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int secondsLimit, int i){
+		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int secondsLimit, Boolean screenshot, String screenshotDir, int i){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
@@ -293,6 +303,8 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.subalgorithms = subalgorithms;
 			this.jquery = jquery;
 			this.secondsLimit = secondsLimit;
+			this.screenshot = screenshot;
+			this.screenshotDir = screenshotDir;
 			this.index = i;
 		}
 		
@@ -422,7 +434,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 		}
 		
-		public Boolean processRow(WebDriver driver, String[] row, DesiredCapabilities cap){
+		public Boolean processRow(WebDriver driver, String[] row, DesiredCapabilities cap, int rowId){
 			String url = row[0];
 			if (!url.startsWith("http")){url = "http://"+url;}
 
@@ -433,7 +445,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        	cell = cell.replace("\"","\\\""); //escape double quotes
 	            row[j] = "\""+cell+"\"";
 	        }
-			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length));
+			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length))+","+rowId;
 
 	        List<String> ansList = new ArrayList<String>();
 	        int failureAlg = -1;
@@ -461,6 +473,20 @@ public class JavaScriptTestingParallelWorkStealing {
 						
 						
 						if(i == (algorithmSubalgorithms-1)){
+							//last subalgorithm
+							if (this.screenshot){
+								File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+								//copy to target location
+								String fname = this.screenshotDir+"/"+row[1]+"_"+j+".png";
+								try {
+									FileUtils.copyFile(scrFile, new File(fname));
+								} catch (IOException e) {
+									System.out.println("Couldn't copy screenshot file: "+fname);
+									e.printStackTrace();
+								}
+								//row[1] should be an id col to use screenshotting
+							}
+							
 							if (ans != null){
 								ArrayList<String> ansRows = new ArrayList<String>(Arrays.asList(ans.toString().split("@#@")));
 								for(int k = 0; k<ansRows.size(); k++){
@@ -499,15 +525,17 @@ public class JavaScriptTestingParallelWorkStealing {
 		    private final WebDriver driver;
 		    private final String[] row;
 		    private final DesiredCapabilities cap;
+		    private int rowIndex;
 
-		    public ProcessRow(WebDriver driver, String[] row, DesiredCapabilities cap) {
+		    public ProcessRow(WebDriver driver, String[] row, DesiredCapabilities cap, int rowIndex) {
 		        this.driver = driver;
 		        this.row = row;
 		        this.cap = cap;
+		        this.rowIndex = rowIndex;
 		    }
 
 		    public Boolean call() throws Exception {
-		    	return processRow(driver,row,cap);
+		    	return processRow(driver,row,cap,rowIndex);
 		    }
 		}
 		
@@ -521,6 +549,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			WebDriver driver = newDriver(cap);
 
 			if (driver instanceof JavascriptExecutor) {
+				int rowCounter = 0;
 				while (true) {
 					String[] row = this.queue.pop();
 					//System.out.println(Arrays.toString(row));
@@ -532,8 +561,9 @@ public class JavaScriptTestingParallelWorkStealing {
 				   
 				   try {
 					//print("secondsLimit: "+this.secondsLimit);
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap), this.secondsLimit, TimeUnit.SECONDS, false);
-
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap,rowCounter), this.secondsLimit, TimeUnit.SECONDS, false);
+					rowCounter++;
+					
 					if (!driverOK){
 						print("!driverOK on row: "+row.toString());
 						print("Replacing driver after !driverOK.");
@@ -607,19 +637,19 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		if (firstSession){
 			system.startSession();
-			system.stage(input1,javaScript1,output1,jquery,threads,30);
-			system.stage(input2,javaScript2,output2,jquery,threads,30);
-			system.stage(input3,javaScript3,output3,jquery,threads,30);
+			system.stage(input1,javaScript1,output1,jquery,threads,30,false,"");
+			system.stage(input2,javaScript2,output2,jquery,threads,30,false,"");
+			system.stage(input3,javaScript3,output3,jquery,threads,30,false,"");
 			//system.stage(input4,javaScript4,output4,jquery,threads);
 			system.endSession();
 			
 			system.startSession();
-			system.stage(input4,javaScript4,output5,jquery,threads,30);
+			system.stage(input4,javaScript4,output5,jquery,threads,30,false,"");
 			system.endSession();
 		}
 		else{
 			system.startSession();
-			system.stage(input4,javaScript4,output6,jquery,threads,30);
+			system.stage(input4,javaScript4,output6,jquery,threads,30,false,"");
 			system.endSession();
 		}
 		        

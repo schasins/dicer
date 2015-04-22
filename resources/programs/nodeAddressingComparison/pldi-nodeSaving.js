@@ -699,9 +699,31 @@ function saveTargetInfoForSimilarityApproach2(node){
     return JSON.stringify(targetInfo);
 }
 
-var func_a1 = function(urlArg,xpath,url1,url2){
+function highlightNode(target, color) {
+  $target = $(target);
+  var offset = $target.offset();
+  var boundingBox = target.getBoundingClientRect();
+  var newDiv = $('<div/>');
+  var idName = 'ringer-hightlight-' + highlightCount;
+  newDiv.attr('id', idName);
+  newDiv.css('width', boundingBox.width);
+  newDiv.css('height', boundingBox.height);
+  newDiv.css('top', offset.top);
+  newDiv.css('left', offset.left);
+  newDiv.css('position', 'absolute');
+  newDiv.css('z-index', 1000);
+  newDiv.css('background-color', color);
+  newDiv.css('opacity', .4);
+  newDiv.css('pointer-events', 'none');
+  $(document.body).append(newDiv);
+  var html = $target.html();
+}
+
+var func_a1 = function(urlArg,xpath,url1,url2,rowId){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
+	
+	highlightNode(node,"#FF00FF");
 
-	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node)+"<,>"+saveTargetInfoForIMacros(node)+"<,>"+saveTargetInfoForSimilarityApproach2(node)+"<,>"+saveTargetInfoForATAQV(node);
+	return urlArg+"<,>"+rowId+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node)+"<,>"+saveTargetInfoForIMacros(node)+"<,>"+saveTargetInfoForSimilarityApproach2(node)+"<,>"+saveTargetInfoForATAQV(node);
 };
