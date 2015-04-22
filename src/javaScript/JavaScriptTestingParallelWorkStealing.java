@@ -445,6 +445,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        	cell = cell.replace("\"","\\\""); //escape double quotes
 	            row[j] = "\""+cell+"\"";
 	        }
+	        print("Making an argstring with rowId: "+rowId);
 			String argString = Joiner.on(",").join(Arrays.copyOfRange(row, 0, row.length))+","+rowId;
 
 	        List<String> ansList = new ArrayList<String>();
@@ -477,7 +478,9 @@ public class JavaScriptTestingParallelWorkStealing {
 							if (this.screenshot){
 								File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
 								//copy to target location
-								String fname = this.screenshotDir+"/"+row[1]+"_"+j+".png";
+								String inputRowId = row[1].replace("\"", "");
+								inputRowId = inputRowId.replace("\'", "");
+								String fname = this.screenshotDir+"/"+inputRowId+"_"+j+".png";
 								try {
 									FileUtils.copyFile(scrFile, new File(fname));
 								} catch (IOException e) {
@@ -525,7 +528,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		    private final WebDriver driver;
 		    private final String[] row;
 		    private final DesiredCapabilities cap;
-		    private int rowIndex;
+		    private final int rowIndex;
 
 		    public ProcessRow(WebDriver driver, String[] row, DesiredCapabilities cap, int rowIndex) {
 		        this.driver = driver;
