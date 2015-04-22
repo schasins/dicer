@@ -284,6 +284,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	private static class RunTests implements Runnable {
 		TaskQueue queue;
+		int rowCounter;
 		String javaScriptFunction;
 		int algorithms;
 		List<Integer> subalgorithms;
@@ -297,6 +298,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int secondsLimit, Boolean screenshot, String screenshotDir, int i){
 			this.queue = queue;
+			this.rowCounter = 0;
 			this.javaScriptFunction = javaScriptFunction;
 			this.writer = writer;
 			this.algorithms = algorithms;
@@ -306,6 +308,11 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.screenshot = screenshot;
 			this.screenshotDir = screenshotDir;
 			this.index = i;
+		}
+		
+		public synchronized int newRowId(){
+			this.rowCounter++;
+			return rowCounter;
 		}
 		
 		public void print(String s){
@@ -552,7 +559,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			WebDriver driver = newDriver(cap);
 
 			if (driver instanceof JavascriptExecutor) {
-				int rowCounter = 0;
 				while (true) {
 					String[] row = this.queue.pop();
 					//System.out.println(Arrays.toString(row));
@@ -564,8 +570,8 @@ public class JavaScriptTestingParallelWorkStealing {
 				   
 				   try {
 					//print("secondsLimit: "+this.secondsLimit);
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap,rowCounter), this.secondsLimit, TimeUnit.SECONDS, false);
-					rowCounter++;
+					int ind = newRowId();
+					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap,ind), this.secondsLimit, TimeUnit.SECONDS, false);
 					
 					if (!driverOK){
 						print("!driverOK on row: "+row.toString());
