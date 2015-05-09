@@ -94,6 +94,18 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		this.secondsLimit = secondsLimit;
 		
+		//let's clear out the tmp directory where profiles can save and accumulate too many and cause crashes
+		System.out.println("Clearing tmp directory of profiles.");
+		String[] shCommand = {"cd", "/tmp", ";", "rm", "*webdriver-profile", ";", "rm", "userprofile*copy"};
+		try {
+			Process p = Runtime.getRuntime().exec(shCommand);
+			p.waitFor();
+			System.out.print(shCommand[2]);
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
 		try {
