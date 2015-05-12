@@ -85,15 +85,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	*/
 	
-	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit, Boolean screenshot, String screenshotDir){
-		this.stages ++;
-		System.out.println("STAGE "+this.stages);
-		
-		this.algorithms = 0;
-		this.subalgorithms = new ArrayList<Integer>();
-		
-		this.secondsLimit = secondsLimit;
-		
+	public static void clearTmpFiles(){
 		//let's clear out the tmp directory where profiles can save and accumulate too many and cause crashes
 		System.out.println("Clearing tmp directory of profiles.");
 		
@@ -105,6 +97,16 @@ public class JavaScriptTestingParallelWorkStealing {
 	        listOfFiles[i].delete();
 	      }
 	    }
+	}
+	
+	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit, Boolean screenshot, String screenshotDir){
+		this.stages ++;
+		System.out.println("STAGE "+this.stages);
+		
+		this.algorithms = 0;
+		this.subalgorithms = new ArrayList<Integer>();
+		
+		this.secondsLimit = secondsLimit;
 		
 		//Input 1
 		List<String[]> rows = new ArrayList<String[]>();
@@ -378,6 +380,8 @@ public class JavaScriptTestingParallelWorkStealing {
 
 		//quits the original driver, checks for defunct processes, calls newDriver to actually create new driver
 		public WebDriver replaceDriver(WebDriver driver, DesiredCapabilities cap){
+			//in case we're getting bad driver stuff because too many tmp files
+			clearTmpFiles();
 			if (driver != null) {driver.quit();}
 			//in case anything goes wrong, let's check for defunct processes
 			try {

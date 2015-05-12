@@ -30,7 +30,7 @@ public class NodeAddressingComparison {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = false;
+		Boolean firstSession = true;
 		
 		if (firstSession){
 			String date = new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date());
