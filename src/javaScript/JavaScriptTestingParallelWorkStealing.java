@@ -219,7 +219,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			p.waitFor();
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.toString().split("\n")[0]);
 		}
 
 		/*try {
@@ -243,7 +243,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			System.out.print(shCommand[2]);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.toString().split("\n")[0]);
 		}
 	}
 	
@@ -293,7 +293,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					output.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.out.println(e.toString().split("\n")[0]);
 				}
 			}
 		}
@@ -401,7 +401,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				}
 			} catch (Exception e1) {
 				print("Weren't able to close defunct processes.");
-				e1.printStackTrace();
+				print(e1.toString().split("\n")[0]);
 			}
 			return newDriver(cap);
 		}
@@ -508,7 +508,7 @@ public class JavaScriptTestingParallelWorkStealing {
 									FileUtils.copyFile(scrFile, new File(fname));
 								} catch (IOException e) {
 									System.out.println("Couldn't copy screenshot file: "+fname);
-									e.printStackTrace();
+									print(e.toString().split("\n")[0]);
 								}
 								//row[1] should be an id col to use screenshotting
 							}
