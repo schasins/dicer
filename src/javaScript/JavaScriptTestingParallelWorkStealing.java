@@ -91,12 +91,19 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		File folder = new File("/tmp");
 		File[] listOfFiles = folder.listFiles();
+		int delCounter = 0;
 	    for (int i = 0; i < listOfFiles.length; i++) {
-	      if (listOfFiles[i].isFile() && (listOfFiles[i].getName().contains("webdriver-profile") || listOfFiles[i].getName().contains("userprofile")))  {
-	        System.out.println("File " + listOfFiles[i].getName());
-	        listOfFiles[i].delete();
+	      if (listOfFiles[i].isDirectory() && (listOfFiles[i].getName().contains("webdriver-profile") || listOfFiles[i].getName().contains("userprofile")))  {
+	        delCounter++;
+	        try {
+				FileUtils.deleteDirectory(listOfFiles[i]);
+			} catch (IOException e) {
+				System.out.println("Couldn't delete the directory: "+listOfFiles[i].getName());
+				e.printStackTrace();
+			}
 	      }
 	    }
+	    System.out.println("Cleared "+delCounter+" files.");
 	}
 	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit, Boolean screenshot, String screenshotDir){
@@ -210,6 +217,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		System.out.println("Starting session.");
+		clearTmpFiles();
 		try {
 			String[] shCommand = {"/bin/sh", "-c", "mkdir " + path_to_proxyserver + ".cache"}; 
 			System.out.println(shCommand[2]);
