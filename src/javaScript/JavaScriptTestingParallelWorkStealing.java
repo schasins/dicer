@@ -106,6 +106,8 @@ public class JavaScriptTestingParallelWorkStealing {
 	}
 	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit, Boolean screenshot, String screenshotDir){
+		clearTmpFiles();
+		
 		this.stages ++;
 		System.out.println("STAGE "+this.stages);
 		
@@ -216,7 +218,6 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void startSession(){
 		System.out.println("Starting session.");
-		clearTmpFiles();
 		try {
 			String[] shCommand = {"/bin/sh", "-c", "mkdir " + path_to_proxyserver + ".cache"}; 
 			System.out.println(shCommand[2]);
@@ -378,6 +379,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 			catch (WebDriverException exc){
 				print("WebDriver exception trying to create new driver.");
+				clearTmpFiles();
 				print(exc.toString().split("\n")[0]);
 				return replaceDriver(null,cap);
 			}
@@ -387,8 +389,6 @@ public class JavaScriptTestingParallelWorkStealing {
 
 		//quits the original driver, checks for defunct processes, calls newDriver to actually create new driver
 		public WebDriver replaceDriver(WebDriver driver, DesiredCapabilities cap){
-			//in case we're getting bad driver stuff because too many tmp files
-			clearTmpFiles();
 			if (driver != null) {driver.quit();}
 			//in case anything goes wrong, let's check for defunct processes
 			try {
