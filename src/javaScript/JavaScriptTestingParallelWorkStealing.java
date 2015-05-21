@@ -99,7 +99,6 @@ public class JavaScriptTestingParallelWorkStealing {
 				FileUtils.deleteDirectory(listOfFiles[i]);
 			} catch (IOException e) {
 				System.out.println("Couldn't delete the directory: "+listOfFiles[i].getName());
-				e.printStackTrace();
 			}
 	      }
 	    }
