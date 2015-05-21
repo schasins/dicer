@@ -543,7 +543,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	        }
 			catch(WebDriverException e){
 				System.out.println("Failure alg: " + failureAlg);
-				System.out.println(url + ": " + e.toString());
+				System.out.println(url + ": " + e.toString().split("\n")[0]);
 				/*
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 				driver.quit();
