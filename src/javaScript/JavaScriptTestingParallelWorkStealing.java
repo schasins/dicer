@@ -363,10 +363,11 @@ public class JavaScriptTestingParallelWorkStealing {
 		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			//FirefoxProfile profile = new ProfilesIni().getProfile("default");
-			//File profileDirectory = new File("/home/sarah/.mozilla/firefox/lu03aqwy.default");
-			File profileDirectory = new File("/home/schasins/.mozilla/firefox/ub15j19p.default");
-			FirefoxProfile profile = new FirefoxProfile(profileDirectory);
+			FirefoxProfile profile = new ProfilesIni().getProfile("default");
+			//FirefoxProfile profile = new ProfilesIni().getProfile("selenium");
+			//File profileDirectory = new File("/home/sarah/.mozilla/firefox/77rmg3bw.selenium");
+			//File profileDirectory = new File("/home/schasins/.mozilla/firefox/ub15j19p.default");
+			//FirefoxProfile profile = new FirefoxProfile(profileDirectory);
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
 	        profile.setPreference("dom.max_script_run_time", this.secondsLimit+50);
 	        profile.setPreference("dom.max_chrome_script_run_time", this.secondsLimit+50);
