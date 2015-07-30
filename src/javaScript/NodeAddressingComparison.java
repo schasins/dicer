@@ -26,7 +26,7 @@ public class NodeAddressingComparison {
 		String output5Start = "resources/tables/nodeAddressingComparison/stage5-nodeClicking";
 		
 		Boolean jquery = true;
-		int threads = 32;
+		int threads = 8;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		

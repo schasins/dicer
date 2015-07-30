@@ -363,7 +363,10 @@ public class JavaScriptTestingParallelWorkStealing {
 		// does the actual driver creation, calls replaceDriver in case of issues
 		public WebDriver newDriver(DesiredCapabilities cap){
 			try{
-			FirefoxProfile profile = new ProfilesIni().getProfile("default");
+			//FirefoxProfile profile = new ProfilesIni().getProfile("default");
+			//File profileDirectory = new File("/home/sarah/.mozilla/firefox/lu03aqwy.default");
+			File profileDirectory = new File("/home/schasins/.mozilla/firefox/ub15j19p.default");
+			FirefoxProfile profile = new FirefoxProfile(profileDirectory);
 	        profile.setPreference("network.cookie.cookieBehavior", 2);
 	        profile.setPreference("dom.max_script_run_time", this.secondsLimit+50);
 	        profile.setPreference("dom.max_chrome_script_run_time", this.secondsLimit+50);
@@ -600,7 +603,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						print("!driverOK on row: "+row.toString());
 						print("Replacing driver after !driverOK.");
 						driver = replaceDriver(driver,cap);
-						print(driver.toString());
+						//print(driver.toString());
 						// Comment out this line for scailability test
 						//this.queue.timeout();
 					}
@@ -610,7 +613,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						print("Replacing driver after exception.");
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver = replaceDriver(driver,cap);
-						print(driver.toString());
+						//print(driver.toString());
 						// Comment out this line for scailability test
 						//this.queue.timeout();
 					} finally {
