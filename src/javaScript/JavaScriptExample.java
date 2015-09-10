@@ -1,39 +1,41 @@
 package javaScript;
 
+import java.io.IOException;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 public class JavaScriptExample {
 	public static void main(String[] args) {
-		WebDriver driver = new FirefoxDriver();
 
-        driver.get("http://www.eecs.berkeley.edu/~mangpo/www/home.html");
-			
-		if (driver instanceof JavascriptExecutor) {
-			System.out.println(
-						((JavascriptExecutor) driver).
-							//executeScript("return document.title;"));	
-							//executeScript("return document.getElementsByClassName(\'subscribe\').length;"));
-							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerText;"));
-							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].innerHTML;"));
-							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"value\");"));
-							//executeScript("return document.getElementsByClassName(\'subscribe\')[0].getAttribute(\"textContent\");"));
-							//firefox doesn't use innerText, uses textContent
-							executeScript("return document.getElementsByClassName(\'subscribe\')[0].textContent;"));
+		String path_to_proxyserver = "/home/mangpo/work/262a/httpmessage/";
+		Process p = null;
+		try {
+			p = Runtime.getRuntime().exec("python " + path_to_proxyserver + "proxyserv.py");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-        driver.get("http://www.cs.berkeley.edu/~bodik/");
+		String PROXY = "localhost:1234";
+		org.openqa.selenium.Proxy proxy = new org.openqa.selenium.Proxy();
+		proxy.setHttpProxy(PROXY).setNoProxy("https:*");
+		DesiredCapabilities cap = new DesiredCapabilities();
+		cap.setCapability(CapabilityType.PROXY, proxy);
 		
-		if (driver instanceof JavascriptExecutor) {
-			System.out.println(
-						((JavascriptExecutor) driver).
-							//executeScript("return document.getElementById(\'footercont\').innerText;"));
-							executeScript("return document.getElementById(\'footercont\').innerHTML;"));
-							//executeScript("return \'test\';"));
-		}
+		FirefoxProfile profile = new ProfilesIni().getProfile("default");
+        profile.setPreference("network.cookie.cookieBehavior", 2);
+        WebDriver driver = new FirefoxDriver(new FirefoxBinary(), profile, cap, cap);
 
-        //Close the browser
+        driver.get("http://www.amazon.com");
         driver.quit();
+        
+        p.destroy();
 	}
 }
