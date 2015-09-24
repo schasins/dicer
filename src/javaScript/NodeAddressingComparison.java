@@ -6,7 +6,7 @@ import java.util.Date;
 public class NodeAddressingComparison {
 
 	public static void main(String[] args) {
-		String input1 = "resources/tables/nodeAddressingComparison/urls-50.csv";
+		String input1 = "resources/tables/nodeAddressingComparison/urls.csv";
 		//String input1 = "resources/tables/nodeAddressingComparison/urls-30.csv";
 		//String input1 = "resources/tables/nodeAddressingComparison/urls-1.csv";
 		String javaScript1 = "resources/programs/nodeAddressingComparison/getXpaths.js";
@@ -26,7 +26,7 @@ public class NodeAddressingComparison {
 		String output5Start = "resources/tables/nodeAddressingComparison/stage5-nodeClicking";
 		
 		Boolean jquery = true;
-		int threads = 8;
+		int threads = 20;
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
