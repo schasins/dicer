@@ -53,8 +53,6 @@ public class JavaScriptTestingParallelWorkStealing {
 	int secondsLimit;
 	static int rowCounter;
 	
-	String determinizeCode;
-	
 	// JavaScript for DOM Modification
 	static String DOMModifierFunctions;
 	static int DOMChange;
@@ -325,8 +323,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		Boolean screenshot;
 		String screenshotDir;
 		int index;
-		String determinizeCode;
-	
+		
 		RunTests(TaskQueue queue, String javaScriptFunction, int algorithms, List<Integer> subalgorithms, CSVWriter writer, Boolean jquery, int secondsLimit, Boolean screenshot, String screenshotDir, int i){
 			this.queue = queue;
 			this.javaScriptFunction = javaScriptFunction;
@@ -338,7 +335,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			this.screenshot = screenshot;
 			this.screenshotDir = screenshotDir;
 			this.index = i;
-			this.determinizeCode = determinizeCode;
 		}
 		
 		public void print(String s){
@@ -383,7 +379,6 @@ public class JavaScriptTestingParallelWorkStealing {
 			driver.manage().timeouts().pageLoadTimeout(this.secondsLimit+5, TimeUnit.SECONDS);
 			driver.manage().timeouts().setScriptTimeout(this.secondsLimit+5, TimeUnit.SECONDS);
 			//print("secondsLimit: "+this.secondsLimit);
-
 			return driver;
 			}
 			catch (WebDriverException exc){
@@ -424,8 +419,6 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		private void loadPage(WebDriver driver, String url) {
 			driver.get(url);
-
-			((JavascriptExecutor) driver).executeScript(this.determinizeCode);
 			// TODO: modify DOM here.
 			Object ans;
 			switch(DOMChange) {
@@ -454,7 +447,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				ans = ((JavascriptExecutor) driver).executeScript(
 						" return document.body.getElementsByTagName(\"h2\").length;");
 				System.out.println(ans.toString());*/
-				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return spanToP();");
+				((JavascriptExecutor) driver).executeScript(DOMModifierFunctions+" return h2Toh3();");
 				/*ans = ((JavascriptExecutor) driver).executeScript(
 						" return document.body.getElementsByTagName(\"h2\").length;");
 				System.out.println(ans.toString());*/
@@ -495,7 +488,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		        for (int j = 0; j<this.algorithms; j++){
 		        	failureAlg = j;
 			        //reload for each algorithm
-		        	loadPage(driver,url,determinize);
+		        	loadPage(driver,url);
 
 					char letter = ((char) ((int) 'a' + j));
 			        int algorithmSubalgorithms = this.subalgorithms.get(j);
@@ -606,7 +599,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					//print("secondsLimit: "+this.secondsLimit);
 					int ind = newRowId();
 					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap,ind), this.secondsLimit, TimeUnit.SECONDS, false);
-		
+					
 					if (!driverOK){
 						print("!driverOK on row: "+row.toString());
 						print("Replacing driver after !driverOK.");
