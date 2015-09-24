@@ -536,7 +536,7 @@ public class JavaScriptTestingParallelWorkStealing {
 									}
 									//if(this.verbose){System.out.println(ansRow);}
 								}
-								System.out.println(ansRows.size());
+								//System.out.println(ansRows.size());
 							}
 						}
 			        }
