@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -384,7 +385,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			catch (WebDriverException exc){
 				print("WebDriver exception trying to create new driver.");
 				clearTmpFiles();
-				print(exc.toString().split("\n")[0]);
+				print(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()) +" - "+exc.toString().split("\n")[0]);
 				return replaceDriver(null,cap);
 			}
 			
@@ -547,8 +548,11 @@ public class JavaScriptTestingParallelWorkStealing {
 		        }
 	        }
 			catch(WebDriverException e){
+				print("-------------");
 				System.out.println("Failure alg: " + failureAlg);
+				System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()));
 				System.out.println(url + ": " + e.toString().split("\n")[0]);
+				print("-------------");
 				/*
 				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 				driver.quit();
@@ -610,9 +614,12 @@ public class JavaScriptTestingParallelWorkStealing {
 						//this.queue.timeout();
 					}
 				    } catch (Exception e) {
+						print("-------------");
 						print("exception on row: "+row.toString());
+						print(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()));
 						print(row[0] + ": " + e.toString().split("\n")[0]);
 						print("Replacing driver after exception.");
+						print("-------------");
 						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
 						driver = replaceDriver(driver,cap);
 						//print(driver.toString());
