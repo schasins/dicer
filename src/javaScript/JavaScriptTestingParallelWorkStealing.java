@@ -384,7 +384,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 			catch (WebDriverException exc){
 				print("WebDriver exception trying to create new driver.");
-				clearTmpFiles();
+				//clearTmpFiles();
 				print(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()) +" - "+exc.toString().split("\n")[0]);
 				return replaceDriver(null,cap);
 			}
