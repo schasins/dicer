@@ -106,6 +106,24 @@ public class JavaScriptTestingParallelWorkStealing {
 	    System.out.println("Cleared "+delCounter+" files.");
 	}
 	
+	public static void clearTmpScreenshots(){
+		System.out.println("Clearing tmp directory of screenshots.");
+		File folder = new File("/tmp");
+		File[] listOfFiles = folder.listFiles();
+		int delCounter = 0;
+	    for (int i = 0; i < listOfFiles.length; i++) {
+	      if (listOfFiles[i].getName().contains("screenshot"))  {
+	        delCounter++;
+	        try {
+				FileUtils.deleteDirectory(listOfFiles[i]);
+			} catch (IOException e) {
+				System.out.println("Couldn't delete the file: "+listOfFiles[i].getName());
+			}
+	      }
+	    }
+	    System.out.println("Cleared "+delCounter+" files.");
+	}
+	
 	public void stage(String inputFile, String javaScriptFile, String outputFile, Boolean jquery, int threads, int secondsLimit, Boolean screenshot, String screenshotDir){
 		clearTmpFiles();
 		
@@ -243,6 +261,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	
 	public void endSession(){
 		System.out.println("Ending session.");
+		clearTmpScreenshots();
 		Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
 		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver +"caches/" + cache_dir}; 
