@@ -37,21 +37,22 @@ public class NodeAddressingComparison {
 			String output4 = output4Start+"_"+date+".csv";
 			String output5 = output5Start+"_"+date+".csv";
 			system.startSession();
-			system.stage(input1,javaScript1,output1,false,threads,200,false,"");
-			system.stage(output1,javaScript2,output2,false,threads,400,false,"");
-			system.stage(output2,javaScript3,output3,true,threads,400,true,"/scratch/schasins/original_nodes_screenshots_"+date);
-			system.stage(output3,javaScript4,output4,true,threads,500,true,"/scratch/schasins/nodes_screenshots_"+date);
-			system.stage(output4,javaScript5,output5,false,threads,500,false,"");
+			system.stage(input1,javaScript1,output1,false,threads,50,false,"");
+			system.stage(output1,javaScript2,output2,false,threads,100,false,"");
+			system.stage(output2,javaScript3,output3,true,threads,100,true,"/scratch/schasins/original_nodes_screenshots_"+date);
+			//system.stage(output3,javaScript4,output4,true,threads,500,true,"/scratch/schasins/nodes_screenshots_"+date);
+			//system.stage(output4,javaScript5,output5,false,threads,500,false,"");
 			system.endSession();
 		}
-		//run a test even if we're doing training, so we have a test very shortly after training
-		String date = new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date());
-		String output42 = output4Start+"_"+date+".csv";
-		String output52 = output5Start+"_"+date+".csv";
-		system.startSession();
-		system.stage(output3,javaScript4,output42,true,threads,500,true,"/scratch/schasins/nodes_screenshots_"+date);
-		system.stage(output42,javaScript5,output52,false,threads,500,false,"");
-		system.endSession();
+		else{
+			String date = new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date());
+			String output42 = output4Start+"_"+date+".csv";
+			String output52 = output5Start+"_"+date+".csv";
+			system.startSession();
+			system.stage(output3,javaScript4,output42,true,threads,800,true,"/scratch/schasins/nodes_screenshots_"+date);
+			system.stage(output42,javaScript5,output52,false,threads,800,false,"");
+			system.endSession();
+		}
 	}
 
 }
