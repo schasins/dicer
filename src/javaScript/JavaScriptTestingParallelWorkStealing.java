@@ -115,7 +115,7 @@ public class JavaScriptTestingParallelWorkStealing {
 	      if (listOfFiles[i].getName().contains("screenshot"))  {
 	        delCounter++;
 	        try {
-				FileUtils.deleteDirectory(listOfFiles[i]);
+				FileUtils.forceDelete(listOfFiles[i]);
 			} catch (IOException e) {
 				System.out.println("Couldn't delete the file: "+listOfFiles[i].getName());
 			}
