@@ -49,7 +49,7 @@ public class NodeAddressingComparison {
 			String output42 = output4Start+"_"+date+".csv";
 			String output52 = output5Start+"_"+date+".csv";
 			system.startSession();
-			system.stage(output3,javaScript4,output42,true,threads,800,true,"/scratch/schasins/nodes_screenshots_"+date);
+			system.stage(output3,javaScript4,output42,true,threads,800,false,"/scratch/schasins/nodes_screenshots_"+date);
 			system.stage(output42,javaScript5,output52,false,threads,800,false,"");
 			system.endSession();
 		}
