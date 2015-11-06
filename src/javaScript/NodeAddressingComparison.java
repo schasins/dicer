@@ -1,5 +1,6 @@
 package javaScript;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,6 +33,12 @@ public class NodeAddressingComparison {
 		
 		Boolean firstSession = false;
 		
+		File f = new File(output1);
+		if(!f.exists()) { 
+		    // we haven't yet run the first session.  better run the first session
+			firstSession = true;
+		}
+		
 		if (firstSession){
 			String date = new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date());
 			String output4 = output4Start+"_"+date+".csv";
@@ -39,9 +46,9 @@ public class NodeAddressingComparison {
 			system.startSession();
 			system.stage(input1,javaScript1,output1,false,threads,50,false,"");
 			system.stage(output1,javaScript2,output2,false,threads,100,false,"");
-			system.stage(output2,javaScript3,output3,true,threads,100,true,"/scratch/schasins/original_nodes_screenshots_"+date);
-			//system.stage(output3,javaScript4,output4,true,threads,500,true,"/scratch/schasins/nodes_screenshots_"+date);
-			//system.stage(output4,javaScript5,output5,false,threads,500,false,"");
+			system.stage(output2,javaScript3,output3,true,threads,100,false,"/scratch/schasins/original_nodes_screenshots_"+date);
+			system.stage(output3,javaScript4,output4,true,threads,800,false,"/scratch/schasins/nodes_screenshots_"+date);
+			system.stage(output4,javaScript5,output5,false,threads,800,false,"");
 			system.endSession();
 		}
 		else{
