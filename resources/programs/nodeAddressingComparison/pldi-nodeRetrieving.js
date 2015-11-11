@@ -763,144 +763,178 @@ function simulateClick(node) {
     node.dispatchEvent(evt);
 }
 
-function highlightNode(target, color) {
-  $target = $(target);
-  var offset = $target.offset();
-  var boundingBox = target.getBoundingClientRect();
-  var newDiv = $('<div/>');
-  newDiv.css('width', boundingBox.width);
-  newDiv.css('height', boundingBox.height);
-  newDiv.css('top', offset.top);
-  newDiv.css('left', offset.left);
-  newDiv.css('position', 'absolute');
-  newDiv.css('z-index', 1000);
-  newDiv.css('background-color', color);
-  newDiv.css('opacity', .4);
-  newDiv.css('pointer-events', 'none');
-  $(document.body).append(newDiv);
-  var html = $target.html();
-}
-
 //an algorithm for pure bookkeeping
 
-var func_a1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
-	return url+"<,>"+rowId+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+targetInfoString+"<,>"+iMacrosTargetInfoString+"<,>"+similarityInfoString+"<,>"+ATAQVInfoString;
+var func_a1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	return url+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+targetInfoString+"<,>"+iMacrosTargetInfoString+"<,>"+similarityInfoString+"<,>"+ATAQVInfoString;
 };
 
 //the (original, Shaon) PLDI paper algorithm
 
-var func_b1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,ATAQVInfoString){
+var func_b1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTarget(targetInfo);
-	if (target == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_b2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
 
 //the iMacros algorithm
 
-var func_c1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,ATAQVInfoString){
+var func_c1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(iMacrosTargetInfoString);
     var node = retrieveTargetForIMacros(targetInfo);
-	if (node == null) { return ""; }
-	highlightNode(node,"#FF00FF");
-	return nodeToXPath(node);
+	if (node == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(node);
+};
+
+var func_c2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
 
 //the new similarity based paper algorithm
 
-var func_d1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_d1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(similarityInfoString);
 	var target = getTargetForSimilarity(targetInfo);
-	if (target == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_d2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
 
 //the ATAQV algorithm
 
-var func_e1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_e1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(ATAQVInfoString);
 	var target = getTargetForATAQV(targetInfo);
-	if (target == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_e2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
 
 //the new similarity based paper algorithm, the version that filters on text first
 
-var func_f1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_f1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(similarityInfoString);
 	var target = getTargetForSimilarityFiltered(targetInfo);
-	if (target == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_f2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
     
 //the various voting subalgorithms
 
-var func_g1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_g1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSimple(targetInfo);
-	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target[0],"#FF00FF");
-	return nodeToXPath(target[0]);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
-var func_h1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_g2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_h1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSuffix(targetInfo);
-	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target[0],"#FF00FF");
-	return nodeToXPath(target[0]);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
-var func_i1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_h2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_i1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetText(targetInfo);
-	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target[0],"#FF00FF");
-	return nodeToXPath(target[0]);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
-var func_j1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_i2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_j1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetClass(targetInfo);
-	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target[0],"#FF00FF");
-	return nodeToXPath(target[0]);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
-var func_k1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_j2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_k1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetId(targetInfo);
-	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target[0],"#FF00FF");
-	return nodeToXPath(target[0]);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
 };
 
-var func_l1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_k2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_l1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(targetInfoString);
 	var target = getTargetSearch(targetInfo);
-	if (target.length < 1 || target[0] == null) { return ""; }
-	highlightNode(target[0],"#FF00FF");
-	return nodeToXPath(target[0]);
+	if (target.length < 1 || target[0] == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target[0]);
+};
+
+var func_l2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };
 
 //the new similarity algorithms that use training on data collected at design time
 
-var func_m1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_m1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(similarityInfoString);
 	var target = getTargetForSimilarityRegression(targetInfo);
-	if (target == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
 };
 
-var func_n1 = function(url,rowId,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+var func_m2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
+};
+
+var func_n1 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
 	var targetInfo = JSON.parse(similarityInfoString);
 	var target = getTargetForSimilaritySVM(targetInfo);
-	if (target == null) { return ""; }
-	highlightNode(target,"#FF00FF");
-	return nodeToXPath(target);
+	if (target == null) { return; } //won't click, so we'll get that the url is the same as the original
+	simulateClick(target);
+};
+
+var func_n2 = function(url,xpath,url1,url2,targetInfoString,iMacrosTargetInfoString,similarityInfoString,ATAQVInfoString){
+	var url3 = window.location.href;
+	return url3;
 };

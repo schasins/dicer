@@ -41,16 +41,16 @@ function simulateClick(node) {
     node.dispatchEvent(evt);
 }
 
-var func_a1 = function(urlArg,xpath,url1,rowId){
+var func_a1 = function(urlArg,xpath,url1){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
 	simulateClick(node);
 };
 
-var func_a2 = function(urlArg,xpath,url1,rowId){
+var func_a2 = function(urlArg,xpath,url1){
 	var url2 = window.location.href;
 	if (url2 == url1){
 		return;
 	}
-	return urlArg+"<,>"+rowId+"<,>"+xpath+"<,>"+url1+"<,>"+url2;
+	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2;
 };

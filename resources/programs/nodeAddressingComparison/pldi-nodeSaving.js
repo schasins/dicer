@@ -699,29 +699,9 @@ function saveTargetInfoForSimilarityApproach2(node){
     return JSON.stringify(targetInfo);
 }
 
-function highlightNode(target, color) {
-  $target = $(target);
-  var offset = $target.offset();
-  var boundingBox = target.getBoundingClientRect();
-  var newDiv = $('<div/>');
-  newDiv.css('width', boundingBox.width);
-  newDiv.css('height', boundingBox.height);
-  newDiv.css('top', offset.top);
-  newDiv.css('left', offset.left);
-  newDiv.css('position', 'absolute');
-  newDiv.css('z-index', 1000);
-  newDiv.css('background-color', color);
-  newDiv.css('opacity', .4);
-  newDiv.css('pointer-events', 'none');
-  $(document.body).append(newDiv);
-  var html = $target.html();
-}
-
-var func_a1 = function(urlArg,rowId,xpath,url1,url2){
+var func_a1 = function(urlArg,xpath,url1,url2){
 	var node = xPathToNode(xpath);
 	if (node == null) { return; }
-	
-	highlightNode(node,"#FF00FF");
 
-	return urlArg+"<,>"+rowId+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node)+"<,>"+saveTargetInfoForIMacros(node)+"<,>"+saveTargetInfoForSimilarityApproach2(node)+"<,>"+saveTargetInfoForATAQV(node);
+	return urlArg+"<,>"+xpath+"<,>"+url1+"<,>"+url2+"<,>"+saveTargetInfo(node)+"<,>"+saveTargetInfoForIMacros(node)+"<,>"+saveTargetInfoForSimilarityApproach2(node)+"<,>"+saveTargetInfoForATAQV(node);
 };
