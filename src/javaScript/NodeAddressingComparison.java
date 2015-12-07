@@ -29,7 +29,7 @@ public class NodeAddressingComparison {
 		
 		JavaScriptTestingParallelWorkStealing system = new JavaScriptTestingParallelWorkStealing();
 		
-		Boolean firstSession = false;
+		Boolean firstSession = false; //TODO: change back to false!
 		
 		File f = new File(output1);
 		if(!f.exists()) { 

@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -248,6 +250,28 @@ public class JavaScriptTestingParallelWorkStealing {
 			// TODO Auto-generated catch block
 			System.out.println(e.toString().split("\n")[0]);
 		}
+		
+		// start the SSL stripping
+		String[] shCommand = {"/scratch/schasins-cache/cacheall-proxy-server", "screen", "-S", "sslstrip", "-X", "quit", ";", "screen", "-S", "sslstrip", "-d", "-m", "python", "sslstrip.py", "-l", "1235"}; 
+		try {
+			Process p = Runtime.getRuntime().exec(shCommand);
+			p.waitFor();
+			System.out.print(shCommand[2]);
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.toString().split("\n")[0]);
+		}
+		
+		// start the cache
+		String[] shCommand2 = {"/scratch/schasins-cache/cacheall-proxy-server", "screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "proxyserv.py"}; 
+		try {
+			Process p = Runtime.getRuntime().exec(shCommand2);
+			p.waitFor();
+			System.out.print(shCommand2[2]);
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.toString().split("\n")[0]);
+		}
 
 		/*try {
 			String command = "python proxyserv.py -c -i "+String.valueOf(System.currentTimeMillis());
@@ -279,9 +303,25 @@ public class JavaScriptTestingParallelWorkStealing {
 		List<String[]> rows;
 		int count, timeout;
 		long start;
+		String currentURL;
+		int rowsSinceCacheRestart;
 		
 		public TaskQueue(List<String[]> rows){
+		    Comparator<String[]> comparator_rows = new Comparator<String[]>() {
+
+		        @Override
+		        public int compare(String[] r1, String[] r2) {
+		            String i = r1[0];
+		            String j = r2[0];
+		            return i.compareTo(j);
+		        }
+
+		    };
+		    Collections.sort(rows, comparator_rows);
 			this.rows = rows;
+			this.currentURL = this.rows.get(0)[0];
+			this.rowsSinceCacheRestart = 0;
+			
 			// Comment out this line for scailability test
 			/*this.count = 0;
 			this.timeout = 0;
@@ -298,6 +338,25 @@ public class JavaScriptTestingParallelWorkStealing {
 		public synchronized String[] pop(){
 			if (this.rows.size()>0){
 				String[] row = this.rows.get(0);
+				String newUrl = row[0];
+				if (newUrl.equals(this.currentURL) || this.rowsSinceCacheRestart < 10){
+					this.rowsSinceCacheRestart += 1;
+				}
+				else{
+					// have to restart the cache
+					this.currentURL = newUrl;
+					this.rowsSinceCacheRestart = 0;
+					
+					String[] shCommand = {"/scratch/schasins-cache/cacheall-proxy-server", "screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "proxyserv.py"}; 
+					try {
+						Process p = Runtime.getRuntime().exec(shCommand);
+						p.waitFor();
+						System.out.print(shCommand[2]);
+					} catch (IOException | InterruptedException e) {
+						// TODO Auto-generated catch block
+						System.out.println(e.toString().split("\n")[0]);
+					}
+				}
 				rows = rows.subList(1, rows.size());
 				return row;
 			}
