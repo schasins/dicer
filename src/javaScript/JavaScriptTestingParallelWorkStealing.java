@@ -252,7 +252,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 		
 		// start the SSL stripping
-		String[] shCommand = {"/scratch/schasins-cache/cacheall-proxy-server", "screen", "-S", "sslstrip", "-X", "quit", ";", "screen", "-S", "sslstrip", "-d", "-m", "python", "sslstrip.py", "-l", "1235"}; 
+		String[] shCommand = {"screen", "-S", "sslstrip", "-X", "quit", ";", "screen", "-S", "sslstrip", "-d", "-m", "python", "~/research/sslstrip-0.9/sslstrip.py", "-l", "1235"}; 
 		try {
 			Process p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
@@ -263,7 +263,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 		
 		// start the cache
-		String[] shCommand2 = {"/scratch/schasins-cache/cacheall-proxy-server", "screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "proxyserv.py"}; 
+		String[] shCommand2 = {"screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
 		try {
 			Process p = Runtime.getRuntime().exec(shCommand2);
 			p.waitFor();
@@ -347,7 +347,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					this.currentURL = newUrl;
 					this.rowsSinceCacheRestart = 0;
 					
-					String[] shCommand = {"/scratch/schasins-cache/cacheall-proxy-server", "screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "proxyserv.py"}; 
+					String[] shCommand = {"screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
 					try {
 						Process p = Runtime.getRuntime().exec(shCommand);
 						p.waitFor();
