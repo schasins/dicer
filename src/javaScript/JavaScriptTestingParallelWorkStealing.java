@@ -352,6 +352,13 @@ public class JavaScriptTestingParallelWorkStealing {
 					this.currentURL = newUrl;
 					this.rowsSinceCacheRestart = 0;
 					
+					// give the other threads a while to finish
+					try {
+					    Thread.sleep(3000);                 //1000 milliseconds is one second.
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+					
 					String[] shCommand = {"screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
 					try {
 						Process p = Runtime.getRuntime().exec(shCommand);
