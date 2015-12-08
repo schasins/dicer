@@ -256,7 +256,6 @@ public class JavaScriptTestingParallelWorkStealing {
 		try {
 			Process p = Runtime.getRuntime().exec(shCommand);
 			p.waitFor();
-			System.out.print(shCommand[2]);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.toString().split("\n")[0]);
@@ -267,10 +266,16 @@ public class JavaScriptTestingParallelWorkStealing {
 		try {
 			Process p = Runtime.getRuntime().exec(shCommand2);
 			p.waitFor();
-			System.out.print(shCommand2[2]);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.toString().split("\n")[0]);
+		}
+		
+		// give the cache time to get set up
+		try {
+		    Thread.sleep(2000);                 //1000 milliseconds is one second.
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
 		}
 
 		/*try {
@@ -355,6 +360,12 @@ public class JavaScriptTestingParallelWorkStealing {
 					} catch (IOException | InterruptedException e) {
 						// TODO Auto-generated catch block
 						System.out.println(e.toString().split("\n")[0]);
+					}
+					// give the cache a while to start up
+					try {
+					    Thread.sleep(2000);                 //1000 milliseconds is one second.
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
 					}
 				}
 				rows = rows.subList(1, rows.size());

@@ -34,6 +34,7 @@ public class NodeAddressingComparison {
 		File f = new File(output1);
 		if(!f.exists()) { 
 		    // we haven't yet run the first session.  better run the first session
+			System.out.println("Going to run the first session.");
 			firstSession = true;
 		}
 		
