@@ -627,10 +627,10 @@ public class JavaScriptTestingParallelWorkStealing {
 								for(int k = 0; k<ansRows.size(); k++){
 									String ansRow = ansRows.get(k);
 									if (ansList.size()>k){
-										ansList.set(k, ansList.get(k)+"<,>"+ansRow);
+										ansList.set(k, ansList.get(k)+"<,>"+ansRow); // our output already includes this row, so we'll just append to those rows
 									}
 									else{
-										ansList.add(ansRow);
+										ansList.add(ansRow); // none of the other algorithms have tried to add an nth row, so let's add it now
 									}
 									//if(this.verbose){System.out.println(ansRow);}
 								}
@@ -653,12 +653,11 @@ public class JavaScriptTestingParallelWorkStealing {
 					driver = newDriver(cap);
 					*/
 					driver = replaceDriver(driver,cap);
-					return false;
 				}
-		        //put anslist in the writer
-		        for(int i = 0; i<ansList.size(); i++){
-		        	this.writer.writeNext(ansList.get(i).split("<,>"));
-		        }
+	        }
+	        //put anslist in the writer
+	        for(int i = 0; i<ansList.size(); i++){
+	        	this.writer.writeNext(ansList.get(i).split("<,>"));
 	        }
 	        return driverOk;
 		}
