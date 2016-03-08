@@ -581,8 +581,9 @@ public class JavaScriptTestingParallelWorkStealing {
 
 	        List<String> ansList = new ArrayList<String>();
 	        int failureAlg = -1;
-	        try{
-		        for (int j = 0; j<this.algorithms; j++){
+	        boolean driverOk = true;
+		    for (int j = 0; j<this.algorithms; j++){
+		    	try{
 		        	failureAlg = j;
 			        //reload for each algorithm
 		        	loadPage(driver,url);
@@ -638,25 +639,28 @@ public class JavaScriptTestingParallelWorkStealing {
 						}
 			        }
 		        }
+				catch(WebDriverException e){
+					driverOk = false;
+					ansList.set(0, ansList.get(0)+"<,>##TIMEOUT##"); // add a timeout cell to the first row.  this is not always appropriate
+					print("-------------");
+					System.out.println("Failure alg: " + failureAlg);
+					System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()));
+					System.out.println(url + ": " + e.toString().split("\n")[0]);
+					print("-------------");
+					/*
+					//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+					driver.quit();
+					driver = newDriver(cap);
+					*/
+					driver = replaceDriver(driver,cap);
+					return false;
+				}
 		        //put anslist in the writer
 		        for(int i = 0; i<ansList.size(); i++){
 		        	this.writer.writeNext(ansList.get(i).split("<,>"));
 		        }
 	        }
-			catch(WebDriverException e){
-				print("-------------");
-				System.out.println("Failure alg: " + failureAlg);
-				System.out.println(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()));
-				System.out.println(url + ": " + e.toString().split("\n")[0]);
-				print("-------------");
-				/*
-				//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
-				driver.quit();
-				driver = newDriver(cap);
-				*/
-				return false;
-			}
-	        return true;
+	        return driverOk;
 		}
 		
 		public class ProcessRow implements Callable<Boolean>{
