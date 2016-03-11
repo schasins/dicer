@@ -565,7 +565,7 @@ public class JavaScriptTestingParallelWorkStealing {
 			}
 		}
 		
-		public Boolean processRow(WebDriver driver, String[] row, DesiredCapabilities cap, int rowId){
+		public WebDriver processRow(WebDriver driver, String[] row, DesiredCapabilities cap, int rowId){
 			String url = row[0];
 			if (!url.startsWith("http")){url = "http://"+url;}
 
@@ -597,7 +597,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					        try{
 								jqueryCode = new Scanner(new File("resources/jquery-1.10.2.min.js")).useDelimiter("\\Z").next();
 							}
-							catch(Exception e){print("Failed to open jquery file."); return true;}
+							catch(Exception e){print("Failed to open jquery file."); return driver;}
 					        ((JavascriptExecutor) driver).executeScript(jqueryCode);
 				        }
 				        
@@ -652,17 +652,38 @@ public class JavaScriptTestingParallelWorkStealing {
 					driver.quit();
 					driver = newDriver(cap);
 					*/
-					driver = replaceDriver(driver,cap);
+					
+					try {
+						print("!driverOK on row: "+row.toString());
+						print("Replacing driver after !driverOK.");
+						driver = replaceDriver(driver,cap);
+						//print(driver.toString());
+						// Comment out this line for scailability test
+						//this.queue.timeout();
+					    }
+					catch (Exception e1) {
+						print("-------------");
+						print("exception on row: "+row.toString());
+						print(new SimpleDateFormat("dd-MM-yyyy-HH-mm").format(new Date()));
+						print(row[0] + ": " + e1.toString().split("\n")[0]);
+						print("Replacing driver after exception.");
+						print("-------------");
+						//this.writer.writeNext((url+"<,>"+e.toString().split("\n")[0]).split("<,>"));
+						driver = replaceDriver(driver,cap);
+						//print(driver.toString());
+						// Comment out this line for scailability test
+						//this.queue.timeout();
+					}
 				}
 	        }
 	        //put anslist in the writer
 	        for(int i = 0; i<ansList.size(); i++){
 	        	this.writer.writeNext(ansList.get(i).split("<,>"));
 	        }
-	        return driverOk;
+	        return driver;
 		}
 		
-		public class ProcessRow implements Callable<Boolean>{
+		public class ProcessRow implements Callable<WebDriver>{
 		    private final WebDriver driver;
 		    private final String[] row;
 		    private final DesiredCapabilities cap;
@@ -675,7 +696,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		        this.rowIndex = rowIndex;
 		    }
 
-		    public Boolean call() throws Exception {
+		    public WebDriver call() throws Exception {
 		    	return processRow(driver,row,cap,rowIndex);
 		    }
 		}
@@ -702,16 +723,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				   try {
 					//print("secondsLimit: "+this.secondsLimit);
 					int ind = newRowId();
-					boolean driverOK = limiter.callWithTimeout(new ProcessRow(driver,row,cap,ind), this.secondsLimit, TimeUnit.SECONDS, false);
-					
-					if (!driverOK){
-						print("!driverOK on row: "+row.toString());
-						print("Replacing driver after !driverOK.");
-						driver = replaceDriver(driver,cap);
-						//print(driver.toString());
-						// Comment out this line for scailability test
-						//this.queue.timeout();
-					}
+					driver = limiter.callWithTimeout(new ProcessRow(driver,row,cap,ind), this.secondsLimit, TimeUnit.SECONDS, false);
 				    } catch (Exception e) {
 						print("-------------");
 						print("exception on row: "+row.toString());
@@ -724,10 +736,7 @@ public class JavaScriptTestingParallelWorkStealing {
 						//print(driver.toString());
 						// Comment out this line for scailability test
 						//this.queue.timeout();
-					} finally {
-						// Comment out this line for scailability test
-						//this.queue.done();
-					}	
+					}
 				}
 			}
 			
