@@ -262,7 +262,7 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		// start the SSL stripping
 		String[] shCommand = {"screen", "-S", "sslstrip", "-X", "quit"};
-		String[] shCommand2 = {"screen", "-S", "sslstrip", "-d", "-m", "python", "~/research/sslstrip-0.9/sslstrip.py", "-l", "1235"}; 
+		String[] shCommand2 = {"screen", "-S", "sslstrip", "-d", "-m", "python", "~/research/sslstrip-0.9/sslstrip.py".replace("~", System.getProperty("user.home")), "-l", "1235"}; 
 		execWrapper(shCommand);
 		execWrapper(shCommand2);
 		
