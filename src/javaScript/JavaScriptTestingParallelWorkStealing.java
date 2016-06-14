@@ -237,6 +237,15 @@ public class JavaScriptTestingParallelWorkStealing {
 		try{writer.close();}catch(Exception e){System.out.println("Failed to close output file.");}			
 	}
 	
+	public void execWrapper(String[] args){
+		try {
+			Process p = Runtime.getRuntime().exec(args);
+			p.waitFor();
+		} catch (IOException | InterruptedException e) {
+			System.out.println(e.toString().split("\n")[0]);
+		}
+	}
+	
 	public void startSession(){
 		System.out.println("Starting session.");
 		try {
@@ -252,24 +261,16 @@ public class JavaScriptTestingParallelWorkStealing {
 		}
 		
 		// start the SSL stripping
-		String[] shCommand = {"screen", "-S", "sslstrip", "-X", "quit", ";", "screen", "-S", "sslstrip", "-d", "-m", "python", "~/research/sslstrip-0.9/sslstrip.py", "-l", "1235"}; 
-		try {
-			Process p = Runtime.getRuntime().exec(shCommand);
-			p.waitFor();
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.toString().split("\n")[0]);
-		}
+		String[] shCommand = {"screen", "-S", "sslstrip", "-X", "quit"};
+		String[] shCommand2 = {"screen", "-S", "sslstrip", "-d", "-m", "python", "~/research/sslstrip-0.9/sslstrip.py", "-l", "1235"}; 
+		execWrapper(shCommand);
+		execWrapper(shCommand2);
 		
 		// start the cache
-		String[] shCommand2 = {"screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
-		try {
-			Process p = Runtime.getRuntime().exec(shCommand2);
-			p.waitFor();
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.toString().split("\n")[0]);
-		}
+		String[] shCommand3 = {"screen", "-S", "cacheall", "-X", "quit"};
+		String[] shCommand4 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
+		execWrapper(shCommand3);
+		execWrapper(shCommand4);
 		
 		// give the cache time to get set up
 		try {
@@ -354,20 +355,17 @@ public class JavaScriptTestingParallelWorkStealing {
 					
 					// give the other threads a while to finish
 					try {
-					    Thread.sleep(3000);                 //1000 milliseconds is one second.
+					    Thread.sleep(5000);                 //1000 milliseconds is one second.
 					} catch(InterruptedException ex) {
 					    Thread.currentThread().interrupt();
 					}
 					
-					String[] shCommand = {"screen", "-S", "cacheall", "-X", "quit", ";", "screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
-					try {
-						Process p = Runtime.getRuntime().exec(shCommand);
-						p.waitFor();
-						System.out.print(shCommand[2]);
-					} catch (IOException | InterruptedException e) {
-						// TODO Auto-generated catch block
-						System.out.println(e.toString().split("\n")[0]);
-					}
+					// restart the cache
+					String[] shCommand3 = {"screen", "-S", "cacheall", "-X", "quit"};
+					String[] shCommand4 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
+					execWrapper(shCommand3);
+					execWrapper(shCommand4);
+					
 					// give the cache a while to start up
 					try {
 					    Thread.sleep(2000);                 //1000 milliseconds is one second.
