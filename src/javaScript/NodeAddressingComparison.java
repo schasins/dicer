@@ -48,12 +48,13 @@ public class NodeAddressingComparison {
 			system.stage(output3,javaScript4,output4,true,threads,400,false,"");
 			system.endSession();
 		}
-		//run a test even if we're doing training, so we have a test very shortly after training
-		String date = new SimpleDateFormat("dd-MM-yyyy-hh-mm").format(new Date());
-		String output42 = output4Start+"_"+date+".csv";
-		system.startSession();
-		system.stage(output3,javaScript4,output42,true,threads,400,false,"");
-		system.endSession();
+		else {
+			String date = new SimpleDateFormat("dd-MM-yyyy-hh-mm").format(new Date());
+			String output42 = output4Start+"_"+date+".csv";
+			system.startSession();
+			system.stage(output3,javaScript4,output42,true,threads,400,false,"");
+			system.endSession();
+		}
 	}
 
 }

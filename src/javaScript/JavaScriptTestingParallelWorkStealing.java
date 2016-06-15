@@ -345,6 +345,8 @@ public class JavaScriptTestingParallelWorkStealing {
 			if (this.rows.size()>0){
 				String[] row = this.rows.get(0);
 				String newUrl = row[0];
+				// a cache restarting approach that works for single-stage but not multi-stage sessions
+				/*
 				if (newUrl.equals(this.currentURL) || this.rowsSinceCacheRestart < 10){
 					this.rowsSinceCacheRestart += 1;
 				}
@@ -373,6 +375,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					    Thread.currentThread().interrupt();
 					}
 				}
+				*/
 				rows = rows.subList(1, rows.size());
 				return row;
 			}
