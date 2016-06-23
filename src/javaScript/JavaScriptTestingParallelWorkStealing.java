@@ -711,10 +711,10 @@ public class JavaScriptTestingParallelWorkStealing {
 			
 			WebDriver driver = newDriver(cap);
 
-			if (driver instanceof JavascriptExecutr) {
+			if (driver instanceof JavascriptExecutor) {
 				while (true) {
 					String[] row = this.queue.pop();
-					System.out.println(Arrays.toString(row));
+					//System.out.println(Arrays.toString(row));
 					if (row == null){
 						break; //the queue is empty
 					}
