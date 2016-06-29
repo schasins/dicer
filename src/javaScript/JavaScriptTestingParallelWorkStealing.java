@@ -268,9 +268,13 @@ public class JavaScriptTestingParallelWorkStealing {
 		
 		// start the cache
 		String[] shCommand3 = {"screen", "-S", "cacheall", "-X", "quit"};
-		String[] shCommand4 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
+		String[] shCommand4 = {"rm", "-rf", path_to_proxyserver + ".cache"}; // let's just make sure there's nothing where we want to build our cache (like an old cache that never got cleaned up)
+		String[] shCommand5 = {"mkdir", path_to_proxyserver + ".cache"}; 
+		String[] shCommand6 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py", "-d", path_to_proxyserver + ".cache"}; 
 		execWrapper(shCommand3);
 		execWrapper(shCommand4);
+		execWrapper(shCommand5);
+		execWrapper(shCommand6);
 		
 		// give the cache time to get set up
 		try {
