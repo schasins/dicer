@@ -349,8 +349,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			if (this.rows.size()>0){
 				String[] row = this.rows.get(0);
 				String newUrl = row[0];
-				// a cache restarting approach that works for single-stage but not multi-stage sessions
-				/*
+				// restarting the cache within a session is fine, as long as we keep using the same cache dir
+				// so it won't reduce the number of files we're searching, but handles cache prog slowing
+				
 				if (newUrl.equals(this.currentURL) || this.rowsSinceCacheRestart < 10){
 					this.rowsSinceCacheRestart += 1;
 				}
@@ -368,7 +369,8 @@ public class JavaScriptTestingParallelWorkStealing {
 					
 					// restart the cache
 					String[] shCommand3 = {"screen", "-S", "cacheall", "-X", "quit"};
-					String[] shCommand4 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
+					String[] shCommand4 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py", "-d", path_to_proxyserver + ".cache"}; 
+					//String[] shCommand4 = {"screen", "-S", "cacheall", "-d", "-m", "python", "/scratch/schasins-cache/cacheall-proxy-server/proxyserv.py"}; 
 					execWrapper(shCommand3);
 					execWrapper(shCommand4);
 					
@@ -379,7 +381,7 @@ public class JavaScriptTestingParallelWorkStealing {
 					    Thread.currentThread().interrupt();
 					}
 				}
-				*/
+				
 				rows = rows.subList(1, rows.size());
 				return row;
 			}
