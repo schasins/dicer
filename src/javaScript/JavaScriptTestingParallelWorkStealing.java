@@ -298,15 +298,14 @@ public class JavaScriptTestingParallelWorkStealing {
 		clearTmpScreenshots();
 		Date date = new Date();
 		String cache_dir = "arch_" + date.toString().replace(" ", "_");
-		String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver +"caches/" + cache_dir}; 
-		try {
-			Process p = Runtime.getRuntime().exec(shCommand);
-			p.waitFor();
-			System.out.print(shCommand[2]);
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.toString().split("\n")[0]);
-		}
+
+		String[] shCommand = {"rm", "-rf", path_to_proxyserver + ".cache"}; // move is being crazy slow.  for now, use this
+		//String[] shCommand = {"/bin/sh", "-c", "mv " + path_to_proxyserver + ".cache " + path_to_proxyserver +"caches/" + cache_dir}; 
+		System.out.println("About to clear cache.");
+		execWrapper(shCommand);
+		System.out.println("Cache cleared.");
+		System.out.println("Ended session.");
+		return;
 	}
 	
 	private class TaskQueue {
@@ -800,9 +799,9 @@ public class JavaScriptTestingParallelWorkStealing {
 			system.stage(input2,javaScript2,output2,jquery,threads,30,false,"");
 			system.stage(input3,javaScript3,output3,jquery,threads,30,false,"");
 			//system.stage(input4,javaScript4,output4,jquery,threads);
-			system.endSession();
+			//system.endSession();
 			
-			system.startSession();
+			//system.startSession();
 			system.stage(input4,javaScript4,output5,jquery,threads,30,false,"");
 			system.endSession();
 		}

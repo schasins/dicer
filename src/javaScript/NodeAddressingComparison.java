@@ -55,6 +55,8 @@ public class NodeAddressingComparison {
 			system.stage(output3,javaScript4,output42,true,threads,400,false,"");
 			system.endSession();
 		}
+		System.out.println("NodeAddressingComparison done.");
+		System.exit(0);
 	}
 
 }
