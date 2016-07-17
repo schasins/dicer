@@ -351,7 +351,7 @@ public class JavaScriptTestingParallelWorkStealing {
 				// restarting the cache within a session is fine, as long as we keep using the same cache dir
 				// so it won't reduce the number of files we're searching, but handles cache prog slowing
 				
-				if (newUrl.equals(this.currentURL) || this.rowsSinceCacheRestart < 10){
+				if (newUrl.equals(this.currentURL) || this.rowsSinceCacheRestart < 100){
 					this.rowsSinceCacheRestart += 1;
 				}
 				else{
